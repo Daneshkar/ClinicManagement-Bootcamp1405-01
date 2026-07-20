@@ -19,8 +19,4 @@
     <ProjectReference Include="..\ClinicManagement.Application\ClinicManagement.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>
