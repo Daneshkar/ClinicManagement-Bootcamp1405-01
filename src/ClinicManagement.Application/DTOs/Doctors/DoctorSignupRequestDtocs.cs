@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ClinicManagement.Application.DTOs.Doctors
 {
- public  record DoctorSignupRequestDtocs
+ public  record DoctorSignupRequestDto
     {
         public required string MedicalID { get; set; }
         public required string Name { get; set; }
