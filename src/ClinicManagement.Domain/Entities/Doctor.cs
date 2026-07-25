@@ -8,7 +8,7 @@ namespace ClinicManagement.Domain.Entities
 
     {
         public required string Name { get; set; }
-        public required string MedicalID { get; set; }
+        public required string MedicalId { get; set; }
         public string PasswordHash { get; set; }
         public decimal Fee { get; set; }
     }
