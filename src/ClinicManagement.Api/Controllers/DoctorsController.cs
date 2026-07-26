@@ -31,5 +31,15 @@ namespace ClinicManagement.Api.Controllers
 
             return Ok(result);
         }
+
+
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<DoctorGetResponseDto>),StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _doctorService.GetAllDoctorsAsync();
+
+            return Ok(result);
+        }
     }
 }
