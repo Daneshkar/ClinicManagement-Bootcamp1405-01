@@ -9,24 +9,20 @@ public class DoctorRepository: IDoctorRepository
 
 {
     private readonly ClinicDbContext _context;
-
     public DoctorRepository(ClinicDbContext context)
     {
         _context = context;
     }
-    
     public async Task<Doctor?> GetByMedicalIdAsync(string medicalId)
     {
         return await _context.Doctors.
-            FirstOrDefaultAsync(d => d.MedicalID == medicalId);
+            FirstOrDefaultAsync(d => d.MedicalId == medicalId);
     }
-
     public async Task<bool> ExistsByMedicalIdAsync(string medicalId)
     {
         return await _context.Doctors.
             AnyAsync(d=> d.MedicalId == medicalId);
     }
-
     public async Task AddAsync(Doctor doctor)
     {
         await _context.Doctors.AddAsync(doctor);
@@ -38,19 +34,14 @@ public class DoctorRepository: IDoctorRepository
             .AsNoTracking()
             .ToListAsync();
     }
-
     public async Task UpdateAsync(Doctor doctor)
     {
         _context.Doctors.Update(doctor);
         await _context.SaveChangesAsync();
     }
-
     public async Task DeleteAsync(Doctor doctor)
     {
         _context.Doctors.Remove(doctor);
         await _context.SaveChangesAsync();
     }
-
-
-
 }
