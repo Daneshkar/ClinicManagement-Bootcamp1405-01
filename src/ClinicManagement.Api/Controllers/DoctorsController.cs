@@ -56,5 +56,26 @@ namespace ClinicManagement.Api.Controllers
 
             return Ok(result);
         }
+
+        [HttpPut("{medicalId}")]
+        [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Update(string medicalId, [FromBody] DoctorUpdateRequestDto request)
+        {
+            var result = await _doctorService.UpdateDoctorAsync(medicalId, request);
+
+            if (!result.IsSuccess)
+            {
+                if (result.Message?.Contains("not found", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    return NotFound(result);
+                }
+
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
     }
 }
