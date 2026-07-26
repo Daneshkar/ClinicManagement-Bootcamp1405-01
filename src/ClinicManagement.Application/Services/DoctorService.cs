@@ -59,93 +59,78 @@ public class DoctorService : IDoctorService
 
 
     }
+
+    
     public async Task<IEnumerable<DoctorGetResponseDto>> GetAllDoctorsAsync()
     {
-
         var doctors = await _doctorRepository.GetAllAsync();
-
         if (!doctors.Any())
         {
             return Enumerable.Empty<DoctorGetResponseDto>();
-
         }
-        var result = doctors.Select(doctor => new DoctorGetResponseDto(doctor.MedicalId, doctor.Name, doctor.Fee));
-        return result;
-
+        return doctors.Select(d => new DoctorGetResponseDto(d.MedicalId, d.Name, d.Fee));
     }
+    
     public async Task<DoctorGetResponseDto> GetDoctorByMedicalIdAsync(string medicalId)
     {
-
-        if (string.IsNullOrWhiteSpace(medicalId))
+        if (String.IsNullOrEmpty(medicalId) || String.IsNullOrWhiteSpace(medicalId))
         {
-
             return null;
         }
-         medicalId = medicalId.Trim();
-        var doctor = await _doctorRepository.GetByMedicalIdAsync(medicalId);
-        if (doctor == null)
-        {
-
-            return null;
-
-        }
-
+        string trimmedMedicalId = medicalId.Trim();
+        var doctor = await _doctorRepository.GetByMedicalIdAsync(trimmedMedicalId);
         if (doctor == null)
         {
             return null;
         }
-
-        return new DoctorGetResponseDto(
-       doctor.MedicalId,
-       doctor.Name,
-       doctor.Fee
-   );
-
+            
+        return  new DoctorGetResponseDto(doctor.MedicalId, doctor.Name, doctor.Fee);
     }
-
+    
 
 
     public async Task<DoctorUpdateResponseDto> UpdateDoctorAsync(string medicalId, DoctorUpdateRequestDto request)
     {
-
-        if (string.IsNullOrWhiteSpace(request.Name))
+        // checking input validness
+        
+        if (String.IsNullOrWhiteSpace(medicalId))
         {
+            return new DoctorUpdateResponseDto(false, "Invalid Input");
+        }
 
-            DoctorUpdateResponseDto updateResponseDto = new DoctorUpdateResponseDto(false, "Invalid doctor name.");
-
-
-            return updateResponseDto;
+        if (String.IsNullOrWhiteSpace(request.Name))
+        {
+            return new DoctorUpdateResponseDto(false, "Invalid input for Name field");
         }
 
         if (request.Fee < 0)
         {
-            DoctorUpdateResponseDto updateResponseDto = new DoctorUpdateResponseDto(false, "Fee cannot be negative.");
-
-            return updateResponseDto;
+            return new DoctorUpdateResponseDto(false, "Fee cannot be negative");
         }
-
-        var doctor = await _doctorRepository.GetByMedicalIdAsync(medicalId);
+        
+        // trimming input
+        string trimmedName = request.Name.Trim();
+        string trimmedMedicalId = medicalId.Trim();
+        
+        
+        var doctor =  await _doctorRepository.GetByMedicalIdAsync(trimmedMedicalId);
+        
+        // checking for designated  availability
         if (doctor == null)
         {
-            return new DoctorUpdateResponseDto(false, "Doctor not found");
+            return new DoctorUpdateResponseDto(false, $"Doctor not found with medicalId:{medicalId}");
         }
-
-        if (doctor.Name == request.Name && doctor.Fee == request.Fee)
-        {
-
-            return new DoctorUpdateResponseDto(true, "No changes were made.");
-        }
-        if (request == null)
-        {
-            return new DoctorUpdateResponseDto(false, "Invalid request.");
-        }
-
-        doctor.Name = request.Name;
+        
+        // updating the record fields with input
+        doctor.Name = trimmedName;
         doctor.Fee = request.Fee;
+        
+        // call 
         await _doctorRepository.UpdateAsync(doctor);
-
-        return new DoctorUpdateResponseDto(true, "Doctor updated successfully.");
+        
+        return new DoctorUpdateResponseDto(true, "Doctor updated successfully");
     }
+
     public async Task<DoctorDeleteResponseDto> DeleteDoctorAsync(string medicalId)
 
     {
@@ -161,7 +146,8 @@ public class DoctorService : IDoctorService
             return new DoctorDeleteResponseDto(false, "Doctor not found.");
         }
 
-        return await _doctorRepository.DeleteAsync(doctor);
+        await _doctorRepository.DeleteAsync(doctor);
+        return  new DoctorDeleteResponseDto(true, "Doctor deleted successfully");
 
 
     }
