@@ -11,7 +11,7 @@ public interface IDoctorService
     public Task<IEnumerable<DoctorGetResponseDto>> GetAllDoctorsAsync();
 
 
-    public Task<DoctorGetResponseDto> GetDoctorByMedicalIdAsync(string medicalId);
+    public Task<DoctorGetResponseDto?> GetDoctorByMedicalIdAsync(string medicalId);
     
 
     public  Task<DoctorUpdateResponseDto> UpdateDoctorAsync(string medicalId, DoctorUpdateRequestDto request);
