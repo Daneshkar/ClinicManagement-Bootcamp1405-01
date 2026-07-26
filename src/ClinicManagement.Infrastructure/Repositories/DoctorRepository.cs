@@ -15,10 +15,10 @@ public class DoctorRepository: IDoctorRepository
         _context = context;
     }
     
-    public async Task<Doctor?> GetByMedicalIdAsync(string medicallId)
+    public async Task<Doctor?> GetByMedicalIdAsync(string medicalId)
     {
         return await _context.Doctors.
-            FirstOrDefaultAsync(d => d.MedicalId == medicallId);
+            FirstOrDefaultAsync(d => d.MedicalID == medicalId);
     }
 
     public async Task<bool> ExistsByMedicalIdAsync(string medicalId)
@@ -32,4 +32,25 @@ public class DoctorRepository: IDoctorRepository
         await _context.Doctors.AddAsync(doctor);
         await _context.SaveChangesAsync();
     }
+    public async Task<IEnumerable<Doctor>> GetAllAsync()
+    {
+        return await _context.Doctors
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task UpdateAsync(Doctor doctor)
+    {
+        _context.Doctors.Update(doctor);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Doctor doctor)
+    {
+        _context.Doctors.Remove(doctor);
+        await _context.SaveChangesAsync();
+    }
+
+
+
 }
