@@ -16,10 +16,10 @@ public class DoctorConfiguration : IEntityTypeConfiguration<Doctor>
         builder.ToTable("Doctors");
 
 
-        builder.HasKey(d => d.MedicalID);
+        builder.HasKey(d => d.MedicalId);
 
 
-        builder.Property(d => d.MedicalID)
+        builder.Property(d => d.MedicalId)
             .IsRequired()
             .HasMaxLength(20)
             .IsUnicode(false);

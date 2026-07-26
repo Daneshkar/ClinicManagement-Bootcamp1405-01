@@ -18,13 +18,13 @@ public class DoctorRepository: IDoctorRepository
     public async Task<Doctor?> GetByMedicalIdAsync(string medicallId)
     {
         return await _context.Doctors.
-            FirstOrDefaultAsync(d => d.MedicalID == medicallId);
+            FirstOrDefaultAsync(d => d.MedicalId == medicallId);
     }
 
     public async Task<bool> ExistsByMedicalIdAsync(string medicalId)
     {
         return await _context.Doctors.
-            AnyAsync(d=> d.MedicalID == medicalId);
+            AnyAsync(d=> d.MedicalId == medicalId);
     }
 
     public async Task AddAsync(Doctor doctor)
