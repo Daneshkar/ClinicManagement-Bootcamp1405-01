@@ -19,7 +19,7 @@ namespace ClinicManagement.Application.Interfaces.Repository
         public Task<IEnumerable<Doctor>> GetAllAsync();
          public Task<Doctor?> UpdateAsync(Doctor doctor);
 
-        public Task<DoctorDeleteResponseDto> DeleteAsync(Doctor doctor);
+        public Task DeleteAsync(Doctor doctor);
 
     }
 }
