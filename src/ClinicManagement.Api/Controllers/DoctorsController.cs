@@ -34,10 +34,25 @@ namespace ClinicManagement.Api.Controllers
 
 
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<DoctorGetResponseDto>),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<DoctorGetResponseDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
         {
             var result = await _doctorService.GetAllDoctorsAsync();
+
+            return Ok(result);
+        }
+
+        [HttpGet("{medicalId}")]
+        [ProducesResponseType(typeof(DoctorGetResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByMedicalId(string medicalId)
+        {
+            var result = await _doctorService.GetDoctorByMedicalIdAsync(medicalId);
+
+            if (result == null)
+            {
+                return NotFound(new { message = $"Doctor with medical ID '{medicalId}' was not found." });
+            }
 
             return Ok(result);
         }
