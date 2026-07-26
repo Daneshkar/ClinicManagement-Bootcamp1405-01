@@ -77,5 +77,32 @@ namespace ClinicManagement.Api.Controllers
 
             return Ok(result);
         }
+
+
+        [HttpDelete("{medicalId}")]
+        [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(string medicalId)
+        {
+            if (string.IsNullOrWhiteSpace(medicalId))
+            {
+                return BadRequest(new DoctorDeleteResponseDto(false, "Medical ID must be provided."));
+            }
+
+            var result = await _doctorService.DeleteDoctorAsync(medicalId);
+
+            if (!result.IsSuccess)
+            {
+                if (result.Message?.Contains("not found", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    return NotFound(result);
+                }
+
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
     }
 }
