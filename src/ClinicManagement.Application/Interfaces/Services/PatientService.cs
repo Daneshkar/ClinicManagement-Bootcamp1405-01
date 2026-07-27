@@ -94,6 +94,40 @@ namespace ClinicManagement.Application.Interfaces.Services
             );
         }
 
+        public async Task<PatientUpdateResponseDto> UpdatePatientAsync(
+    string nationalCode,
+    PatientUpdateRequestDto request)
+        {
+            if (string.IsNullOrWhiteSpace(nationalCode))
+            {
+                return new PatientUpdateResponseDto(false, "Invalid national code.");
+            }
+
+            string trimmedNationalCode = nationalCode.Trim();
+            string trimmedName = request.Name.Trim();
+            string trimmedPhone = request.Phone.Trim();
+
+            if (string.IsNullOrWhiteSpace(trimmedName))
+            {
+                return new PatientUpdateResponseDto(false, "Name is required.");
+            }
+
+            var patient = await _patientRepository
+                .GetByNationalCodeAsync(trimmedNationalCode);
+
+            if (patient == null)
+            {
+                return new PatientUpdateResponseDto(false, "Patient not found.");
+            }
+
+            patient.Name = trimmedName;
+            patient.Phone = trimmedPhone;
+
+            await _patientRepository.UpdateAsync(patient);
+
+            return new PatientUpdateResponseDto(true, null);
+        }
+
 
 
 
