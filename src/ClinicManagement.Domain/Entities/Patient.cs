@@ -4,7 +4,10 @@ using System.Text;
 
 namespace ClinicManagement.Domain.Entities
 {
-    internal class Patient
+    public class Patient
     {
+        public required string NationalCode { get; set; }
+        public required string Name { get; set; }
+        public string? Phone { get; set; }
     }
 }
