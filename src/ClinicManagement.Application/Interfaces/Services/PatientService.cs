@@ -53,5 +53,24 @@ namespace ClinicManagement.Application.Interfaces.Services
             return new PatientCreateResponseDto(true, null);
         }
 
+        public async Task<IEnumerable<PatientGetResponseDto>> GetAllPatientsAsync()
+        {
+            var patients = await _patientRepository.GetAllAsync();
+
+            if (!patients.Any())
+            {
+                return Enumerable.Empty<PatientGetResponseDto>();
+            }
+
+            return patients.Select(p => new PatientGetResponseDto(
+                p.NationalCode,
+                p.Name,
+                p.Phone
+            ));
+        }
+
+
+
+
     }
 }
