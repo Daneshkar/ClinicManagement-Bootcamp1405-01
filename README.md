@@ -1,7 +1,7 @@
 # ClinicManagement-Botcamp1405-01
 
 ![Git Workflow](docs/images/git_workflow.png)
-![Git Workflow](docs/images/Feature%20Branch%20Review-2026-07-27-144003.png)
+![Git Workflow](docs/images/colab.png)
 ورک فلو اختصاصی تیم به همراه فیچر های دور اول توسعه
 
 # 1. Update your local copy of the feature branch
