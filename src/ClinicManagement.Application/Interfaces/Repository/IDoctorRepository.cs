@@ -8,17 +8,11 @@ namespace ClinicManagement.Application.Interfaces.Repository
 {
     public interface IDoctorRepository
     {
-
-        public Task<Doctor?> GetByMedicalIdAsync(string medicallId);
-
+        public Task<Doctor?> GetByMedicalIdAsync(string medicalId);
         public Task<bool> ExistsByMedicalIdAsync(string medicalId);
-
         public Task AddAsync(Doctor doctor);
-
-
         public Task<IEnumerable<Doctor>> GetAllAsync();
-         public Task<Doctor?> UpdateAsync(Doctor doctor);
-
+        public Task UpdateAsync(Doctor doctor);
         public Task DeleteAsync(Doctor doctor);
 
     }
