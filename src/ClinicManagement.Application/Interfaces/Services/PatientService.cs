@@ -128,6 +128,28 @@ namespace ClinicManagement.Application.Interfaces.Services
             return new PatientUpdateResponseDto(true, null);
         }
 
+        public async Task<PatientDeleteResponseDto> DeletePatientAsync(string nationalCode)
+        {
+            if (string.IsNullOrWhiteSpace(nationalCode))
+            {
+                return new PatientDeleteResponseDto(false, "Invalid national code.");
+            }
+
+            string trimmedNationalCode = nationalCode.Trim();
+
+            var patient = await _patientRepository
+                .GetByNationalCodeAsync(trimmedNationalCode);
+
+            if (patient == null)
+            {
+                return new PatientDeleteResponseDto(false, "Patient not found.");
+            }
+
+            await _patientRepository.DeleteAsync(patient);
+
+            return new PatientDeleteResponseDto(true, null);
+        }
+
 
 
 
