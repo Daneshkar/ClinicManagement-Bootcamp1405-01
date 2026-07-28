@@ -50,7 +50,7 @@ namespace ClinicManagement.Application.Interfaces.Services
 
             await _patientRepository.AddAsync(patient);
 
-            return new PatientCreateResponseDto(true, null);
+            return new PatientCreateResponseDto(true, "Patient created successfully");
         }
 
         public async Task<IEnumerable<PatientGetResponseDto>> GetAllPatientsAsync()
@@ -125,7 +125,7 @@ namespace ClinicManagement.Application.Interfaces.Services
 
             await _patientRepository.UpdateAsync(patient);
 
-            return new PatientUpdateResponseDto(true, null);
+            return new PatientUpdateResponseDto(true, "Patient Updated successfully!");
         }
 
         public async Task<PatientDeleteResponseDto> DeletePatientAsync(string nationalCode)
@@ -147,7 +147,7 @@ namespace ClinicManagement.Application.Interfaces.Services
 
             await _patientRepository.DeleteAsync(patient);
 
-            return new PatientDeleteResponseDto(true, null);
+            return new PatientDeleteResponseDto(true, "Patient deleted successfully!");
         }
 
 
