@@ -7,11 +7,11 @@ namespace ClinicManagement.Application.Interfaces.Repository
 {
     public interface IPatientRepository
     {
-        public Task<Patient?> GetByNationalCodeAsync(string nationalCode);
-        public Task<bool> ExistsByNationalCodeAsync(string nationalCode);
-        public Task<IEnumerable<Patient>> GetAllAsync();
-        public Task AddAsync(Patient patient);
-        public Task UpdateAsync(Patient patient);
-        public Task DeleteAsync(Patient patient);
+        Task<Patient?> GetByNationalCodeAsync(string nationalCode);
+        Task<bool> ExistsByNationalCodeAsync(string nationalCode);
+        Task<IEnumerable<Patient>> GetAllAsync();
+        Task AddAsync(Patient patient);
+        Task UpdateAsync(Patient patient);
+        Task DeleteAsync(Patient patient);
     }
 }
