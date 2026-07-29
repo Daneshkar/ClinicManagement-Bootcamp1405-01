@@ -25,6 +25,27 @@ namespace ClinicManagement.Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{nationalCode}")]
+        [ProducesResponseType(typeof(PatientGetResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Get([FromRoute] string nationalCode)
+        {
+            if (string.IsNullOrWhiteSpace(nationalCode))
+            {
+                return BadRequest("NationalCode is required.");
+            }
+
+            var patient = await _patientService.GetPatientByNationalCodeAsync(nationalCode);
+
+            if (patient is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(patient);
+        }
+
         [HttpPost]
         [ProducesResponseType(typeof(PatientCreateResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(PatientCreateResponseDto), StatusCodes.Status400BadRequest)]
