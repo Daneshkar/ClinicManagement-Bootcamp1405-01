@@ -69,5 +69,29 @@ namespace ClinicManagement.Api.Controllers
 
             return Ok(result);
         }
+
+        [HttpPut("{nationalCode}")]
+        [ProducesResponseType(typeof(PatientUpdateResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PatientUpdateResponseDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(PatientUpdateResponseDto), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Put([FromRoute] string nationalCode, [FromBody] PatientUpdateRequestDto request)
+        {
+            var result = await _patientService.UpdatePatientAsync(nationalCode, request);
+
+            if (!result.IsSuccess)
+            {
+                // Patient not found -> 404 Not Found
+                if (result.Message is not null &&
+                    result.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+                {
+                    return NotFound(result);
+                }
+
+                // Invalid input (e.g., empty Name) -> 400 Bad Request
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
     }
 }
