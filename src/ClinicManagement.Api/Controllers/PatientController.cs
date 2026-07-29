@@ -1,5 +1,7 @@
-﻿using ClinicManagement.Application.DTOs.Patients;
+﻿using ClinicManagement.Application.DTOs.Doctors;
+using ClinicManagement.Application.DTOs.Patients;
 using ClinicManagement.Application.Interfaces.Services;
+using ClinicManagement.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 namespace ClinicManagement.Api.Controllers
 {
@@ -12,6 +14,15 @@ namespace ClinicManagement.Api.Controllers
         public PatientController(IPatientService patientService)
         {
             _patientService = patientService;
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<PatientGetResponseDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _patientService.GetAllPatientsAsync();
+
+            return Ok(result);
         }
 
         [HttpPost]
