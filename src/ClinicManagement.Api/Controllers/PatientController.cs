@@ -93,5 +93,36 @@ namespace ClinicManagement.Api.Controllers
 
             return Ok(result);
         }
+
+        [HttpDelete("{nationalCode}")]
+        [ProducesResponseType(typeof(PatientDeleteResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PatientDeleteResponseDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(PatientDeleteResponseDto), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete([FromRoute] string nationalCode)
+        {
+            var result = await _patientService.DeletePatientAsync(nationalCode);
+
+            if (!result.IsSuccess)
+            {
+                // Empty/whitespace nationalCode -> 400 Bad Request
+                if (result.Message is not null &&
+                    result.Message.Contains("required", StringComparison.OrdinalIgnoreCase))
+                {
+                    return BadRequest(result);
+                }
+
+                // Patient not found -> 404 Not Found
+                if (result.Message is not null &&
+                    result.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+                {
+                    return NotFound(result);
+                }
+
+                // Fallback: unspecified failure -> 400 Bad Request
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
     }
 }
