@@ -11,6 +11,7 @@ namespace ClinicManagement.Infrastructure
 {
     public static class DependencyInjection
     {
+        #region [- AddInfrastructure -]
         public static IServiceCollection AddInfrastructure(
             this IServiceCollection services,
             IConfiguration configuration)
@@ -26,10 +27,12 @@ namespace ClinicManagement.Infrastructure
                         typeof(ClinicDbContext).Assembly.FullName)));
 
             services.AddScoped<IDoctorRepository, DoctorRepository>();
+            services.AddScoped<IPatientRepository, PatientRepository>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
 
             return services;
-        }
+        } 
+        #endregion
     }
 }
 
