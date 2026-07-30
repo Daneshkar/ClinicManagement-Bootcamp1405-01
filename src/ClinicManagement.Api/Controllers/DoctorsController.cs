@@ -1,0 +1,108 @@
+﻿using ClinicManagement.Application.DTOs.Doctors;
+using ClinicManagement.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ClinicManagement.Api.Controllers
+{
+
+    [ApiController]
+    [Route("api/[controller]")]
+    public class DoctorsController : ControllerBase
+    {
+        private readonly IDoctorService _doctorService;
+
+        public DoctorsController(IDoctorService doctorService)
+        {
+            _doctorService = doctorService;
+        }
+
+        [HttpPost("signup")]
+        [ProducesResponseType(typeof(DoctorSignupResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(DoctorSignupResponseDto), StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> Signup([FromBody] DoctorSignupRequestDto request)
+        {
+            var result = await _doctorService.SignupAsync(request);
+
+            if (!result.IsSuccess)
+            {
+                return Conflict(result);
+            }
+
+            return Ok(result);
+        }
+
+
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<DoctorGetResponseDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _doctorService.GetAllDoctorsAsync();
+
+            return Ok(result);
+        }
+
+        [HttpGet("{medicalId}")]
+        [ProducesResponseType(typeof(DoctorGetResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByMedicalId(string medicalId)
+        {
+            var result = await _doctorService.GetDoctorByMedicalIdAsync(medicalId);
+
+            if (result == null)
+            {
+                return NotFound(new { message = $"Doctor with medical ID '{medicalId}' was not found." });
+            }
+
+            return Ok(result);
+        }
+
+        [HttpPut("{medicalId}")]
+        [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Update(string medicalId, [FromBody] DoctorUpdateRequestDto request)
+        {
+            var result = await _doctorService.UpdateDoctorAsync(medicalId, request);
+
+            if (!result.IsSuccess)
+            {
+                if (result.Message?.Contains("not found", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    return NotFound(result);
+                }
+
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
+
+
+        [HttpDelete("{medicalId}")]
+        [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(string medicalId)
+        {
+            if (string.IsNullOrWhiteSpace(medicalId))
+            {
+                return BadRequest(new DoctorDeleteResponseDto(false, "Medical ID must be provided."));
+            }
+
+            var result = await _doctorService.DeleteDoctorAsync(medicalId);
+
+            if (!result.IsSuccess)
+            {
+                if (result.Message?.Contains("not found", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    return NotFound(result);
+                }
+
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
+    }
+}
