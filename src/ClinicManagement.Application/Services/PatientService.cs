@@ -72,11 +72,6 @@ namespace ClinicManagement.Application.Interfaces.Services
         public async Task<PatientGetResponseDto?> GetPatientByNationalCodeAsync(
     string nationalCode)
         {
-            if (string.IsNullOrWhiteSpace(nationalCode))
-            {
-                return null;
-            }
-
             string trimmedNationalCode = nationalCode.Trim();
 
             var patient = await _patientRepository
