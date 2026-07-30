@@ -1,3 +1,4 @@
+using ClinicManagement.Application.Interfaces;
 using ClinicManagement.Application.Interfaces.Services;
 using ClinicManagement.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,7 @@ public static class DependencyInjection
     {
         //To Do: add services later
         services.AddScoped<IDoctorService, DoctorService>();
+        services.AddScoped<IPatientService, PatientService>();
         return services;
     }
 }
