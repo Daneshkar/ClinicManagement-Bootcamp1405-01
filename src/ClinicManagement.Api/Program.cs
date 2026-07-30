@@ -11,9 +11,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // 3. Register Clean Architecture Layers
-// builder.Services.AddApplication();
-// builder.Services.AddInfrastructure(builder.Configuration);
-
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 var app = builder.Build();
