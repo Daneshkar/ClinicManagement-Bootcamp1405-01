@@ -6,7 +6,6 @@ using ClinicManagement.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 namespace ClinicManagement.Infrastructure
 {
     public static class DependencyInjection
@@ -19,20 +18,17 @@ namespace ClinicManagement.Infrastructure
             var connectionString = configuration.GetConnectionString("DefaultConnection")
                 ?? throw new InvalidOperationException(
                     "Connection string 'DefaultConnection' was not found in configuration.");
-
             services.AddDbContext<ClinicDbContext>(options =>
                 options.UseSqlServer(
                     connectionString,
                     sqlOptions => sqlOptions.MigrationsAssembly(
                         typeof(ClinicDbContext).Assembly.FullName)));
-
             services.AddScoped<IDoctorRepository, DoctorRepository>();
             services.AddScoped<IPatientRepository, PatientRepository>();
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
-
             return services;
-        } 
+        }
         #endregion
     }
 }
-
