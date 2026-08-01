@@ -4,8 +4,8 @@ namespace ClinicManagement.Application.Interfaces.Repository
 {
     public interface IAppointmentRepository
     {
-        public Task<List<DateTime>> GetBookedVisitDatesAsync(string doctorMedicalId, DateTime date);
-        public Task<bool> ExistsAsync(string doctorMedicalId, DateTime visitDate);
+        public Task<IEnumerable<Appointment>> GetBookedVisitDatesAsync(string medicalId, DateTime startDate, DateTime endDate);
+        public Task<bool> ExistsAsync(string medicalId, DateTime startDate);
         public Task AddAsync(Appointment appointment);
     }
 }
