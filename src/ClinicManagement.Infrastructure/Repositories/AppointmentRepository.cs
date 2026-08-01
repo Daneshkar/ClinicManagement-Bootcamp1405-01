@@ -7,32 +7,34 @@ namespace ClinicManagement.Infrastructure.Repositories
 {
     public class AppointmentRepository : IAppointmentRepository
     {
-        private readonly ClinicDbContext _context;
+    
+        private readonly ClinicDbContext clinicDbContext;
 
         public AppointmentRepository(ClinicDbContext context)
         {
-            _context = context;
+            clinicDbContext = context;
+        }
+        public async Task<IEnumerable<Appointment>> GetBookedVisitDatesAsync(string medicalId, DateTime startDate, DateTime endDate)
+        {
+
+            var reservedSlots = clinicDbContext.Appointments.
+                Where(bookedList => bookedList.DoctorMedicalId == medicalId).
+                Where(bookedSlot =>
+                    bookedSlot.VisitDate >= startDate && bookedSlot.VisitDate <endDate)
+                .AsNoTracking().
+                ToList();
+            return reservedSlots;
         }
 
-        public async Task<List<DateTime>> GetBookedVisitDatesAsync(string doctorMedicalId, DateTime date)
+        public async Task<bool> ExistsAsync(string medicalId, DateTime startDate)
         {
-            return await _context.Appointments
-                .AsNoTracking()
-                .Where(a => a.DoctorMedicalId == doctorMedicalId && a.VisitDate.Date == date.Date)
-                .Select(a => a.VisitDate)
-                .ToListAsync();
-        }
-
-        public async Task<bool> ExistsAsync(string doctorMedicalId, DateTime visitDate)
-        {
-            return await _context.Appointments
-                .AnyAsync(a => a.DoctorMedicalId == doctorMedicalId && a.VisitDate == visitDate);
-        }
+            return await clinicDbContext.Appointments
+                .AnyAsync(a => a.DoctorMedicalId == medicalId && a.VisitDate == startDate);    }
 
         public async Task AddAsync(Appointment appointment)
         {
-            await _context.Appointments.AddAsync(appointment);
-            await _context.SaveChangesAsync();
+            clinicDbContext.Appointments.Add(appointment);
+            await clinicDbContext.SaveChangesAsync();
         }
     }
 }
