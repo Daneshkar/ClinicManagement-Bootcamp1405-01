@@ -27,16 +27,13 @@ public class AppointmentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAvailableSlots(string doctorMedicalId)
     {
-        var result = await _appointmentService.GetAvailableSlotsAsync(doctorMedicalId, DateTime.Today);
-        
+        var result = await _appointmentService.GetAvailableSlotsAsync(doctorMedicalId, DateTime.Now);
         if (result == null)
         {
-            return NotFound(new { Message = $"No doctor was found with Medical ID '{doctorMedicalId}'." });
+            return NotFound(new { Message = $"No doctor found with ID '{doctorMedicalId}'." });
         }
-
         return Ok(result);
     }
-
     /// <summary>
     /// Books a 1-hour appointment slot for a patient.
     /// </summary>

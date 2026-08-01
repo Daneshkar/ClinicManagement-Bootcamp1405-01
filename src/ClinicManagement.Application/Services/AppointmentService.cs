@@ -24,33 +24,32 @@ public class AppointmentService : IAppointmentService
     
     public async Task<DoctorAvailableSlotsResponseDto> GetAvailableSlotsAsync(string medicalId, DateTime startDate)
     {
-        // 1. Verify doctor existence
         var doctorExists = await _doctorRepository.ExistsByMedicalIdAsync(medicalId);
         if (!doctorExists)
         {
             return null;
         }
 
-        // 2. Normalize to 00:00:00 and compute exclusive 7-day boundary
-        var start = startDate.Date;
-        var end = start.AddDays(ScheduleDaysSpan);
+        // Generate 7 full calendar days starting from 00:00 today
+        var rangeStart = startDate.Date;
+        var rangeEnd = rangeStart.AddDays(ScheduleDaysSpan);
 
-        // 3. Generate master schedule and fetch booked appointments
-        List<DateTime> allPossibleSlots = GenerateWorkingHoursForNextWeek(start);
-        var bookedAppointments = await _appointmentRepository.GetBookedVisitDatesAsync(medicalId, start, end);
+        List<DateTime> allPossibleSlots = GenerateWorkingHoursForNextWeek(rangeStart);
+        var bookedAppointments = await _appointmentRepository.GetBookedVisitDatesAsync(medicalId, rangeStart, rangeEnd);
         var bookedSet = new HashSet<DateTime>(bookedAppointments.Select(a => a.VisitDate));
 
-        // 4. Set-subtraction: filter available slots
+        // Filter out:
+        // 1) Slots earlier than the requested time (e.g. 09:00, 10:00, 11:00 if startDate is 12:12)
+        // 2) Slots already reserved
         var freeSlots = allPossibleSlots
-            .Where(slot => !bookedSet.Contains(slot))
-            .Select(freeSlot => new AvailableSlotDto(
-                StartTime: freeSlot,
-                EndTime: freeSlot.AddMinutes(59).AddSeconds(59)))
+            .Where(slot => slot > startDate && !bookedSet.Contains(slot))
+            .Select(slot => new AvailableSlotDto(
+                StartTime: slot,
+                EndTime: slot.AddMinutes(59).AddSeconds(59)))
             .ToList();
 
         return new DoctorAvailableSlotsResponseDto(medicalId, freeSlots);
     }
-
     public async Task<AppointmentCreateResponseDto> BookAppointmentAsync(AppointmentCreateRequestDto request)
     {
         // check for patient existance
