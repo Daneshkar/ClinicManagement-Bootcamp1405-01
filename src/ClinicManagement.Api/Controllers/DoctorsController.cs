@@ -1,4 +1,5 @@
-﻿using ClinicManagement.Application.Common;
+﻿using Azure.Core;
+using ClinicManagement.Application.Common;
 using ClinicManagement.Application.DTOs.Doctors;
 using ClinicManagement.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -21,89 +22,95 @@ namespace ClinicManagement.Api.Controllers
         [ProducesResponseType(typeof(DoctorSignupResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(DoctorSignupResponseDto), StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> Signup([FromBody] DoctorSignupRequestDto request)
+
+
+        public async Task<IActionResult> Signup([FromBody] DoctorSignupRequest request)
+
         {
             var result = await _doctorService.SignupAsync(request);
 
-            if (!result.IsSuccess)
+            if (result.IsSuccess)
             {
-                return Conflict(result);
+                return Ok(result.Value);
             }
 
-            return Ok(result);
+            return HandleError(result.Error);
         }
 
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<DoctorGetResponseDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAll()
+       
+        public async Task<IActionResult> GetAll([FromQuery] GetAllDoctorsRequest request)
         {
-            var result = await _doctorService.GetAllDoctorsAsync();
+            var result = await _doctorService.GetAllDoctorsAsync(request);
 
-            return Ok(result);
-        }
-
-        [HttpGet("{medicalId}")]
-        [ProducesResponseType(typeof(DoctorGetResponseDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByMedicalId(string medicalId)
-        {
-            var result = await _doctorService.GetDoctorByMedicalIdAsync(medicalId);
-
-            if (result == null)
+            if (result.IsSuccess)
             {
-                return NotFound(new { message = $"Doctor with medical ID '{medicalId}' was not found." });
+                return Ok(result.Value);
             }
 
-            return Ok(result);
+            return HandleError(result.Error);
         }
 
-        [HttpPut("{medicalId}")]
+        [HttpGet("{MedicalId}")]
+        [ProducesResponseType(typeof(DoctorGetResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+        
+
+           public async Task<IActionResult> GetByMedicalId(
+                [FromRoute] string MedicalId)
+        {
+            var request = new GetDoctorByIdRequest(MedicalId);
+
+            var result = await _doctorService.GetDoctorByMedicalIdAsync(request);
+
+            if (result.IsSuccess)
+            {
+                return Ok(result.Value);
+            }
+
+            return HandleError(result.Error);
+        }
+        
+
+        [HttpPut]
         [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(string medicalId, [FromBody] DoctorUpdateRequestDto request)
+
+        public async Task<IActionResult> Update(
+           [FromBody] UpdateDoctorRequest request)
         {
-            var result = await _doctorService.UpdateDoctorAsync(medicalId, request);
+            var result = await _doctorService.UpdateDoctorAsync(request);
 
-            if (!result.IsSuccess)
+            if (result.IsSuccess)
             {
-                if (result.Message?.Contains("not found", StringComparison.OrdinalIgnoreCase) == true)
-                {
-                    return NotFound(result);
-                }
-
-                return BadRequest(result);
+                return Ok(result.Value);
             }
 
-            return Ok(result);
+            return HandleError(result.Error);
         }
 
 
-        [HttpDelete("{medicalId}")]
+        [HttpDelete("{MedicalId}")]
         [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(string medicalId)
+        public async Task<IActionResult> Delete(
+            [FromRoute] DeleteDoctorRequest request)
         {
-            if (string.IsNullOrWhiteSpace(medicalId))
+         
+             var result = await _doctorService.DeleteDoctorAsync(request);
+
+            if (result.IsSuccess)
             {
-                return BadRequest(new DoctorDeleteResponseDto(false, "Medical ID must be provided."));
+                return Ok(result.Value);
             }
 
-            var result = await _doctorService.DeleteDoctorAsync(medicalId);
+            return HandleError(result.Error);
 
-            if (!result.IsSuccess)
-            {
-                if (result.Message?.Contains("not found", StringComparison.OrdinalIgnoreCase) == true)
-                {
-                    return NotFound(result);
-                }
-
-                return BadRequest(result);
-            }
-
-            return Ok(result);
         }
         
         
@@ -121,11 +128,18 @@ namespace ClinicManagement.Api.Controllers
                 ErrorType.NotFound => StatusCode(StatusCodes.Status404NotFound, error),
                 ErrorType.Conflict => StatusCode(StatusCodes.Status409Conflict, error),
                 ErrorType.Validation => StatusCode(StatusCodes.Status400BadRequest,
-                    error), 
+                    error),
                 _ => StatusCode(StatusCodes.Status400BadRequest, error) // Default for other unexpected errors
             };
+
+
+            
         }
+
+
+
+    }
         
         
     }
-}
+
