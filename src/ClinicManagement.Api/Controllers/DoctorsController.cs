@@ -23,6 +23,7 @@ namespace ClinicManagement.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(DoctorSignupResponseDto), StatusCodes.Status409Conflict)]
 
+
         public async Task<IActionResult> Signup([FromBody] DoctorSignupRequest request)
 
         {
@@ -39,7 +40,7 @@ namespace ClinicManagement.Api.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<DoctorGetResponseDto>), StatusCodes.Status200OK)]
-        [HttpGet]
+       
         public async Task<IActionResult> GetAll([FromQuery] GetAllDoctorsRequest request)
         {
             var result = await _doctorService.GetAllDoctorsAsync(request);
@@ -68,7 +69,7 @@ namespace ClinicManagement.Api.Controllers
             return HandleError(result.Error);
         }
 
-        [HttpPut("{medicalId}")]
+        [HttpPut]
         [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status404NotFound)]
@@ -104,7 +105,6 @@ namespace ClinicManagement.Api.Controllers
 
             return HandleError(result.Error);
 
-            return Ok(result);
         }
         
         
