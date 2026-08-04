@@ -53,12 +53,17 @@ namespace ClinicManagement.Api.Controllers
             return HandleError(result.Error);
         }
 
-        [HttpGet("{medicalId}")]
+        [HttpGet("{MedicalId}")]
         [ProducesResponseType(typeof(DoctorGetResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByMedicalId(
-               [FromRoute] GetDoctorByIdRequest request)
+
+        
+
+           public async Task<IActionResult> GetByMedicalId(
+                [FromRoute] string MedicalId)
         {
+            var request = new GetDoctorByIdRequest(MedicalId);
+
             var result = await _doctorService.GetDoctorByMedicalIdAsync(request);
 
             if (result.IsSuccess)
@@ -68,6 +73,7 @@ namespace ClinicManagement.Api.Controllers
 
             return HandleError(result.Error);
         }
+        
 
         [HttpPut]
         [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status200OK)]
@@ -88,7 +94,7 @@ namespace ClinicManagement.Api.Controllers
         }
 
 
-        [HttpDelete("{medicalId}")]
+        [HttpDelete("{MedicalId}")]
         [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status404NotFound)]
