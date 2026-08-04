@@ -117,7 +117,6 @@ namespace ClinicManagement.Api.Controllers
             // Assuming ErrorType is an enum or similar structure
             // and that Error has properties like 'Code', 'Message', and 'Type'.
             // You might need to adjust this based on your exact Error and ErrorType structure.
-
             return error.Type switch
             {
                 ErrorType.NotFound => StatusCode(StatusCodes.Status404NotFound, error),
@@ -126,15 +125,7 @@ namespace ClinicManagement.Api.Controllers
                     error),
                 _ => StatusCode(StatusCodes.Status400BadRequest, error) // Default for other unexpected errors
             };
-
-
-            
         }
-
-
-
     }
-        
-        
     }
 

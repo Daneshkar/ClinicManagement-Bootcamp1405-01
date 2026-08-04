@@ -4,6 +4,8 @@ using ClinicManagement.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ClinicManagement.Application.Common;
+using FluentValidation.Results;
 
 namespace ClinicManagement.Application.Interfaces.Services
 {
@@ -145,6 +147,16 @@ namespace ClinicManagement.Application.Interfaces.Services
             return new PatientDeleteResponseDto(true, "Patient deleted successfully!");
         }
 
+        // --- Helper Method to Format Validation Errors ---
+        private Error FormatValidationErrors(List<ValidationFailure> failures)
+        {
+            string aggregatedErrors = string.Join(" | ", failures.Select(f => $"{f.PropertyName}: {f.ErrorMessage}"));
+            // Using ErrorType.Validation and a generic code for all validation failures
+            return Error.Validation(
+                "Model.Validation", // A generic code for validation issues
+                $"Input validation failed: {aggregatedErrors}"
+            );
+        }
 
 
 
