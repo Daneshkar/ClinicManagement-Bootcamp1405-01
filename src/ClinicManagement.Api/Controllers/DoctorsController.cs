@@ -19,11 +19,9 @@ namespace ClinicManagement.Api.Controllers
         }
 
         [HttpPost("signup")]
-        [ProducesResponseType(typeof(DoctorSignupResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DoctorResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(DoctorSignupResponseDto), StatusCodes.Status409Conflict)]
-
-
+        [ProducesResponseType(typeof(DoctorResponse), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Signup([FromBody] DoctorSignupRequest request)
 
         {
@@ -39,7 +37,7 @@ namespace ClinicManagement.Api.Controllers
 
 
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<DoctorGetResponseDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<DoctorResponse>), StatusCodes.Status200OK)]
        
         public async Task<IActionResult> GetAll([FromQuery] GetAllDoctorsRequest request)
         {
@@ -54,11 +52,8 @@ namespace ClinicManagement.Api.Controllers
         }
 
         [HttpGet("{MedicalId}")]
-        [ProducesResponseType(typeof(DoctorGetResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DoctorResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-
-        
-
            public async Task<IActionResult> GetByMedicalId(
                 [FromRoute] string MedicalId)
         {
@@ -76,9 +71,9 @@ namespace ClinicManagement.Api.Controllers
         
 
         [HttpPut]
-        [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(DoctorUpdateResponseDto), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(DoctorResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DoctorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(DoctorResponse), StatusCodes.Status404NotFound)]
 
         public async Task<IActionResult> Update(
            [FromBody] UpdateDoctorRequest request)
@@ -95,9 +90,9 @@ namespace ClinicManagement.Api.Controllers
 
 
         [HttpDelete("{MedicalId}")]
-        [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(DoctorDeleteResponseDto), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(DoctorResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DoctorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(DoctorResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(
             [FromRoute] DeleteDoctorRequest request)
         {
