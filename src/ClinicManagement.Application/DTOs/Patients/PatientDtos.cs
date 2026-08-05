@@ -38,108 +38,108 @@ namespace ClinicManagement.Application.DTOs.Patients
 
         }
 
-        public record GetPatientByNationalCodeRequest
-        {
+//        public record GetPatientByNationalCodeRequest
+//        {
 
-            public string NationalCode { get; init; }
-
-
+//            public string NationalCode { get; init; }
 
 
-            public GetPatientByNationalCodeRequest(
 
 
-                string? nationalcode)
-            {
+//            public GetPatientByNationalCodeRequest(
 
-                NationalCode=nationalcode?.Trim() ?? string.Empty;
 
-            }
+//                string? nationalcode)
+//            {
+
+//                NationalCode=nationalcode?.Trim() ?? string.Empty;
+
+//            }
              
 
 
 
 
-        }
-        public record GetPatientsRequest
-        {
+//        }
+//        public record GetPatientsRequest
+//        {
 
 
 
 
-        }
+//        }
 
-        public record UpdatePatientRequest
-        {
+//        public record UpdatePatientRequest
+//        {
 
-            public string NationalCode { get; init; }
-            public string Name { get; init; }
-            public string Phone { get; init; }
-
-
+//            public string NationalCode { get; init; }
+//            public string Name { get; init; }
+//            public string Phone { get; init; }
 
 
 
 
-            public UpdatePatientRequest(
+
+
+//            public UpdatePatientRequest(
                 
-                string? nationalcode,
-                string? name,
-                string? phone
+//                string? nationalcode,
+//                string? name,
+//                string? phone
 
-                )
-            {
-                NationalCode=nationalcode?.Trim() ?? string.Empty;
-                Name =name?.Trim() ?? string.Empty;
-                Phone =phone?.Trim() ?? string.Empty;
+//                )
+//            {
+//                NationalCode=nationalcode?.Trim() ?? string.Empty;
+//                Name =name?.Trim() ?? string.Empty;
+//                Phone =phone?.Trim() ?? string.Empty;
 
-            }
+//            }
 
-        }
-
-
-        public record DeletePatientRequest
-        {
-
-            public string NationalCode { get; init; }
+//        }
 
 
+//        public record DeletePatientRequest
+//        {
 
-            public DeletePatientRequest(
+//            public string NationalCode { get; init; }
+
+
+
+//            public DeletePatientRequest(
                 
-                string? nationalcode
-                )
-            {
-                NationalCode=nationalcode ?? string.Empty;
+//                string? nationalcode
+//                )
+//            {
+//                NationalCode=nationalcode ?? string.Empty;
 
-            }
-
-
-        }
-
-        public record PatientResponse
-        {
-            public string NationalCode { get; init; }
-            public string Name { get; init; }
-            public string Phone { get; init; }
+//            }
 
 
-            public PatientResponse(
+//        }
 
-                string? nationalcode,
-                string? name,
-                string? phone
-                )
-            {
+//        public record PatientResponse
+//        {
+//            public string NationalCode { get; init; }
+//            public string Name { get; init; }
+//            public string Phone { get; init; }
 
-                NationalCode=nationalcode? .Trim() ?? string.Empty;
-                Name=name?.Trim() ?? string.Empty;
-                Phone=phone?.Trim() ?? string.Empty;
-            }
 
-        }
-    }
-}
+//            public PatientResponse(
+
+//                string? nationalcode,
+//                string? name,
+//                string? phone
+//                )
+//            {
+
+//                NationalCode=nationalcode? .Trim() ?? string.Empty;
+//                Name=name?.Trim() ?? string.Empty;
+//                Phone=phone?.Trim() ?? string.Empty;
+//            }
+
+//        }
+//    }
+//}
 
 
 
