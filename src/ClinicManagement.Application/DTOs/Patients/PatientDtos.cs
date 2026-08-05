@@ -113,29 +113,29 @@ namespace ClinicManagement.Application.DTOs.Patients
 
         }
 
-//        public record PatientResponse
-//        {
-//            public string NationalCode { get; init; }
-//            public string Name { get; init; }
-//            public string Phone { get; init; }
+        public record PatientResponse
+        {
+            public string NationalCode { get; init; }
+            public string Name { get; init; }
+            public string Phone { get; init; }
 
 
-//            public PatientResponse(
+            public PatientResponse(
 
-//                string? nationalcode,
-//                string? name,
-//                string? phone
-//                )
-//            {
+                string? nationalcode,
+                string? name,
+                string? phone
+                )
+            {
 
-//                NationalCode=nationalcode? .Trim() ?? string.Empty;
-//                Name=name?.Trim() ?? string.Empty;
-//                Phone=phone?.Trim() ?? string.Empty;
-//            }
+                NationalCode = nationalcode?.Trim() ?? string.Empty;
+                Name = name?.Trim() ?? string.Empty;
+                Phone = phone?.Trim() ?? string.Empty;
+            }
 
-//        }
-//    }
-//}
+        }
+    }
+}
 
 
 
