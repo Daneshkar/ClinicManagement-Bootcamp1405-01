@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using ClinicManagement.Application.DTOs.Patients;
 using FluentValidation;
 
@@ -21,9 +19,9 @@ namespace ClinicManagement.Application.Validators
 
             RuleFor(x => x.Name)
                 .NotEmpty()
-                .WithMessage("Name is required.")
+                .WithMessage("Patient name is required.")
                 .MaximumLength(30)
-                .WithMessage("must not exceed 30 characters");
+                .WithMessage("Patient name cannot exceed 30 characters.");
 
 
             RuleFor(x => x.Phone)
@@ -33,17 +31,17 @@ namespace ClinicManagement.Application.Validators
 
             RuleFor(x => x.Password)
                 .NotEmpty()
-                .WithMessage("Password is required")
+                .WithMessage("Password is required.")
                 .MinimumLength(8)
                 .WithMessage("Password must be at least 8 characters.");
 
         }
     }
 
-    public class UpdateRequestValidator : AbstractValidator<UpdatePatientRequest>
+    public class UpdatePatientRequestValidator : AbstractValidator<UpdatePatientRequest>
     {
 
-        public UpdateRequestValidator()
+        public UpdatePatientRequestValidator()
         {
 
             RuleFor(x => x.NationalCode)
@@ -56,9 +54,9 @@ namespace ClinicManagement.Application.Validators
 
             RuleFor(x => x.Name)
                 .NotEmpty()
-                .WithMessage("Name is required.")
+                .WithMessage("Patient name is required.")
                 .MaximumLength(30)
-                .WithMessage("must not exceed 30 characters");
+                .WithMessage("Patient name cannot exceed 30 characters.");
 
 
             RuleFor(x => x.Phone)
@@ -67,6 +65,7 @@ namespace ClinicManagement.Application.Validators
             .When(x => !string.IsNullOrEmpty(x.Phone));
 
         }
+    }
         public class DeletePatientRequestValidator : AbstractValidator<DeletePatientRequest>
         {
 
@@ -76,13 +75,27 @@ namespace ClinicManagement.Application.Validators
             {
                 RuleFor(x => x.NationalCode)
          .NotEmpty()
-         .WithMessage("National Code is required.");
+         .WithMessage("National Code is required for deletion.");
 
 
             }
 
 
 
+        }
+
+
+
+    public class GetPatientByNationalCodeRequestValidator:AbstractValidator<GetPatientByNationalCodeRequest>
+    
+    {
+        public GetPatientByNationalCodeRequestValidator()
+        {
+            RuleFor(x => x.NationalCode)
+                .NotEmpty()
+                .WithMessage("National Code is required.")
+                .Length(10)
+                .WithMessage("National Code must be 10 characters.");
         }
     }
 }
