@@ -1,164 +1,72 @@
-﻿using ClinicManagement.Application.DTOs.Patients;
+﻿using ClinicManagement.Application.Common;
+using ClinicManagement.Application.DTOs.Patients;
 using ClinicManagement.Application.Interfaces.Repository;
-using ClinicManagement.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using ClinicManagement.Application.Common;
-using FluentValidation.Results;
+using FluentValidation;
 
 namespace ClinicManagement.Application.Interfaces.Services
 {
-     public class PatientService : IPatientService
+    public class PatientService : IPatientService
     {
         private readonly IPatientRepository _patientRepository;
 
-        public PatientService(IPatientRepository patientRepository)
+        private readonly IPasswordHasher _passwordHasher;
+
+        private readonly IValidator<PatientSignupRequest> _patientSignupRequestValidator;
+        private readonly IValidator<GetPatientByNationalCodeRequest> _getPatientByNationalCodeRequestValidator;
+        private readonly IValidator<UpdatePatientRequest> _updatePatientRequestValidator;
+        private readonly IValidator<DeletePatientRequest> _deletePatientRequestValidator;
+
+
+        public PatientService(
+            IPatientRepository patientRepository,
+            IPasswordHasher passwordHasher,
+            IValidator<PatientSignupRequest> patientSignupRequestValidator,
+            IValidator<GetPatientByNationalCodeRequest> getPatientByNationalCodeRequestValidator,
+            IValidator<UpdatePatientRequest> updatePatientRequestValidator,
+            IValidator<DeletePatientRequest> deletePatientRequestValidator)
         {
             _patientRepository = patientRepository;
+            _passwordHasher = passwordHasher;
+
+            _patientSignupRequestValidator = patientSignupRequestValidator;
+            _getPatientByNationalCodeRequestValidator = getPatientByNationalCodeRequestValidator;
+            _updatePatientRequestValidator = updatePatientRequestValidator;
+            _deletePatientRequestValidator = deletePatientRequestValidator;
         }
 
 
-        public async Task<PatientCreateResponseDto> CreatePatientAsync(
-    PatientCreateRequestDto request)
+        public async Task<Result<PatientResponse>> SignupAsync(
+            PatientSignupRequest request)
         {
-            string nationalCode = request.NationalCode.Trim();
-            string name = request.Name.Trim();
-            string phone = request.Phone.Trim();
-
-            if (string.IsNullOrEmpty(nationalCode) || string.IsNullOrEmpty(name))
-            {
-                return new PatientCreateResponseDto(
-                    false,
-                    "National Code and Name are required.");
-            }
-
-            bool exists = await _patientRepository
-                .ExistsByNationalCodeAsync(nationalCode);
-
-            if (exists)
-            {
-                return new PatientCreateResponseDto(
-                    false,
-                    "Patient with this National Code already exists.");
-            }
-
-            var patient = new Patient
-            {
-                NationalCode = nationalCode,
-                Name = name,
-                Phone = phone
-            };
-
-            await _patientRepository.AddAsync(patient);
-
-            return new PatientCreateResponseDto(true, "Patient created successfully");
+            throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<PatientGetResponseDto>> GetAllPatientsAsync()
+
+        public async Task<Result<IEnumerable<PatientResponse>>> GetAllPatientsAsync(
+            GetAllPatientsRequest request)
         {
-            var patients = await _patientRepository.GetAllAsync();
-
-            if (!patients.Any())
-            {
-                return Enumerable.Empty<PatientGetResponseDto>();
-            }
-
-            return patients.Select(p => new PatientGetResponseDto(
-                p.NationalCode,
-                p.Name,
-                p.Phone
-            ));
+            throw new NotImplementedException();
         }
 
-        public async Task<PatientGetResponseDto?> GetPatientByNationalCodeAsync(
-    string nationalCode)
+
+        public async Task<Result<PatientResponse>> GetPatientByNationalCodeAsync(
+            GetPatientByNationalCodeRequest request)
         {
-            string trimmedNationalCode = nationalCode.Trim();
-
-            var patient = await _patientRepository
-                .GetByNationalCodeAsync(trimmedNationalCode);
-
-            if (patient == null)
-            {
-                return null;
-            }
-
-            return new PatientGetResponseDto(
-                patient.NationalCode,
-                patient.Name,
-                patient.Phone
-            );
+            throw new NotImplementedException();
         }
 
-        public async Task<PatientUpdateResponseDto> UpdatePatientAsync(
-    string nationalCode,
-    PatientUpdateRequestDto request)
+
+        public async Task<Result<PatientResponse>> UpdatePatientAsync(
+            UpdatePatientRequest request)
         {
-            if (string.IsNullOrWhiteSpace(nationalCode))
-            {
-                return new PatientUpdateResponseDto(false, "Invalid national code.");
-            }
-
-            string trimmedNationalCode = nationalCode.Trim();
-            string trimmedName = request.Name.Trim();
-            string trimmedPhone = request.Phone.Trim();
-
-            if (string.IsNullOrWhiteSpace(trimmedName))
-            {
-                return new PatientUpdateResponseDto(false, "Name is required.");
-            }
-
-            var patient = await _patientRepository
-                .GetByNationalCodeAsync(trimmedNationalCode);
-
-            if (patient == null)
-            {
-                return new PatientUpdateResponseDto(false, "Patient not found.");
-            }
-
-            patient.Name = trimmedName;
-            patient.Phone = trimmedPhone;
-
-            await _patientRepository.UpdateAsync(patient);
-
-            return new PatientUpdateResponseDto(true, "Patient Updated successfully!");
+            throw new NotImplementedException();
         }
 
-        public async Task<PatientDeleteResponseDto> DeletePatientAsync(string nationalCode)
+
+        public async Task<Result<PatientResponse>> DeletePatientAsync(
+            DeletePatientRequest request)
         {
-            if (string.IsNullOrWhiteSpace(nationalCode))
-            {
-                return new PatientDeleteResponseDto(false, "Invalid national code.");
-            }
-
-            string trimmedNationalCode = nationalCode.Trim();
-
-            var patient = await _patientRepository
-                .GetByNationalCodeAsync(trimmedNationalCode);
-
-            if (patient == null)
-            {
-                return new PatientDeleteResponseDto(false, "Patient not found.");
-            }
-
-            await _patientRepository.DeleteAsync(patient);
-
-            return new PatientDeleteResponseDto(true, "Patient deleted successfully!");
+            throw new NotImplementedException();
         }
-
-        // --- Helper Method to Format Validation Errors ---
-        private Error FormatValidationErrors(List<ValidationFailure> failures)
-        {
-            string aggregatedErrors = string.Join(" | ", failures.Select(f => $"{f.PropertyName}: {f.ErrorMessage}"));
-            // Using ErrorType.Validation and a generic code for all validation failures
-            return Error.Validation(
-                "Model.Validation", // A generic code for validation issues
-                $"Input validation failed: {aggregatedErrors}"
-            );
-        }
-
-
-
     }
 }
