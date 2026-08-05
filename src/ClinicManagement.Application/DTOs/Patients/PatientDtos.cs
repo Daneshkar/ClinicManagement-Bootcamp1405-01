@@ -38,29 +38,25 @@ namespace ClinicManagement.Application.DTOs.Patients
 
         }
 
-//        public record GetPatientByNationalCodeRequest
-//        {
+     public record GetPatientByNationalCodeRequest
+      {
 
-//            public string NationalCode { get; init; }
-
-
+          public string NationalCode { get; init; }
 
 
-//            public GetPatientByNationalCodeRequest(
 
+           public GetPatientByNationalCodeRequest(
 
-//                string? nationalcode)
-//            {
+             string? nationalcode)
+          {
+              NationalCode=nationalcode?.Trim() ?? string.Empty;
 
-//                NationalCode=nationalcode?.Trim() ?? string.Empty;
-
-//            }
+          }
              
 
 
+      }
 
-
-//        }
 //        public record GetPatientsRequest
 //        {
 
