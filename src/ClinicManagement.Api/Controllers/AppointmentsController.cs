@@ -1,3 +1,4 @@
+using ClinicManagement.Application.Common;
 using ClinicManagement.Application.DTOs.Appointments;
 using ClinicManagement.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
@@ -58,5 +59,25 @@ public class AppointmentController : ControllerBase
         }
 
         return Ok(result);
+    }
+    
+    
+    
+    // --- Custom Error Handling Method ---
+    // This method is assumed to exist within the controller or a base controller.
+    // It maps your custom Error object to appropriate HTTP responses.
+    private IActionResult HandleError(Error error)
+    {
+        // Assuming ErrorType is an enum or similar structure
+        // and that Error has properties like 'Code', 'Message', and 'Type'.
+        // You might need to adjust this based on your exact Error and ErrorType structure.
+        return error.Type switch
+        {
+            ErrorType.NotFound => StatusCode(StatusCodes.Status404NotFound, error),
+            ErrorType.Conflict => StatusCode(StatusCodes.Status409Conflict, error),
+            ErrorType.Validation => StatusCode(StatusCodes.Status400BadRequest,
+                error),
+            _ => StatusCode(StatusCodes.Status400BadRequest, error) // Default for other unexpected errors
+        };
     }
 }
