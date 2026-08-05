@@ -94,24 +94,24 @@ namespace ClinicManagement.Application.DTOs.Patients
         }
 
 
-//        public record DeletePatientRequest
-//        {
+        public record DeletePatientRequest
+        {
 
-//            public string NationalCode { get; init; }
-
-
-
-//            public DeletePatientRequest(
-
-//                string? nationalcode
-//                )
-//            {
-//                NationalCode=nationalcode ?? string.Empty;
-
-//            }
+            public string NationalCode { get; init; }
 
 
-//        }
+
+            public DeletePatientRequest(
+
+                string? nationalcode
+                )
+            {
+                NationalCode = nationalcode ?? string.Empty;
+
+            }
+
+
+        }
 
 //        public record PatientResponse
 //        {
