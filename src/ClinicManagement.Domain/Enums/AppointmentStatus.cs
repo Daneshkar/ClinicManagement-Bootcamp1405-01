@@ -1,4 +1,4 @@
-namespace ClinicManagement.Domain.Enums;
+
 
 namespace ClinicManagement.Domain.Enums
 {

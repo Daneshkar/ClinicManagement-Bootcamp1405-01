@@ -4,15 +4,12 @@ using System.Text;
 
 namespace ClinicManagement.Application.DTOs.Patients
 {
-     class PatientDtos
-    {
-
+   
         public record PatientSignupRequest
         {
             public string NationalCode { get; init; }
             public string Name {  get; init; }
             public string Phone {  get; init; }
-
             public string Password {  get; init; }
 
 
@@ -31,7 +28,7 @@ namespace ClinicManagement.Application.DTOs.Patients
                 NationalCode=nationalcode?.Trim() ?? string.Empty;
                 Name=name?.Trim() ?? string.Empty;
                 Phone=phone?.Trim() ?? string.Empty;
-
+                Password=password ?? string.Empty; 
 
             }
 
@@ -57,7 +54,7 @@ namespace ClinicManagement.Application.DTOs.Patients
 
       }
 
-       public record GetPatientsRequest
+       public record GetAllPatientsRequest
       {
 
 
@@ -106,7 +103,7 @@ namespace ClinicManagement.Application.DTOs.Patients
                 string? nationalcode
                 )
             {
-                NationalCode = nationalcode ?? string.Empty;
+                NationalCode = nationalcode?.Trim() ?? string.Empty;
 
             }
 
@@ -128,13 +125,13 @@ namespace ClinicManagement.Application.DTOs.Patients
                 )
             {
 
-                NationalCode = nationalcode?.Trim() ?? string.Empty;
-                Name = name?.Trim() ?? string.Empty;
-                Phone = phone?.Trim() ?? string.Empty;
+                NationalCode = nationalcode ?? string.Empty;
+                Name = name ?? string.Empty;
+                Phone = phone ?? string.Empty;
             }
 
         }
-    }
+    
 }
 
 
