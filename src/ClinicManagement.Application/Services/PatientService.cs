@@ -10,7 +10,7 @@ namespace ClinicManagement.Application.Interfaces.Services
     {
         private readonly IPatientRepository _patientRepository;
 
-        private readonly IPasswordHasher _passwordHasher;
+        
 
         private readonly IValidator<PatientSignupRequest> _patientSignupRequestValidator;
         private readonly IValidator<GetPatientByNationalCodeRequest> _getPatientByNationalCodeRequestValidator;
@@ -20,15 +20,14 @@ namespace ClinicManagement.Application.Interfaces.Services
 
         public PatientService(
             IPatientRepository patientRepository,
-            IPasswordHasher passwordHasher,
+           
             IValidator<PatientSignupRequest> patientSignupRequestValidator,
             IValidator<GetPatientByNationalCodeRequest> getPatientByNationalCodeRequestValidator,
             IValidator<UpdatePatientRequest> updatePatientRequestValidator,
             IValidator<DeletePatientRequest> deletePatientRequestValidator)
         {
             _patientRepository = patientRepository;
-            _passwordHasher = passwordHasher;
-
+           
             _patientSignupRequestValidator = patientSignupRequestValidator;
             _getPatientByNationalCodeRequestValidator = getPatientByNationalCodeRequestValidator;
             _updatePatientRequestValidator = updatePatientRequestValidator;
@@ -151,8 +150,6 @@ namespace ClinicManagement.Application.Interfaces.Services
             await _patientRepository.UpdateAsync(patient);
             return Result<PatientResponse>.Success(
                 new PatientResponse(patient.NationalCode, patient.Name, patient.Phone));
-
-
 
 
         }
