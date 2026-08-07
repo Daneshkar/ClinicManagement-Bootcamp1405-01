@@ -1,23 +1,20 @@
+using ClinicManagement.Application.Common;
 using ClinicManagement.Application.DTOs.Doctors;
 
 namespace ClinicManagement.Application.Interfaces.Services;
 
+
 public interface IDoctorService
 {
-    Task<DoctorSignupResponseDto> SignupAsync(DoctorSignupRequestDto request);
+    Task<Result<DoctorResponse>> SignupAsync(DoctorSignupRequest request);
 
+    Task<Result<IEnumerable<DoctorResponse>>> GetAllDoctorsAsync(GetAllDoctorsRequest request);
 
+    Task<Result<DoctorResponse>> GetDoctorByMedicalIdAsync(GetDoctorByIdRequest request);
 
-    Task<IEnumerable<DoctorGetResponseDto>> GetAllDoctorsAsync();
+    Task<Result<DoctorResponse>> UpdateDoctorAsync(UpdateDoctorRequest request);
 
-
-    Task<DoctorGetResponseDto?> GetDoctorByMedicalIdAsync(string medicalId);
-    
-
-    Task<DoctorUpdateResponseDto> UpdateDoctorAsync(string medicalId, DoctorUpdateRequestDto request);
-
-    Task<DoctorDeleteResponseDto> DeleteDoctorAsync(string medicalId);
-
-
-
+    Task<Result<DoctorResponse>> DeleteDoctorAsync(DeleteDoctorRequest request);
 }
+
+
