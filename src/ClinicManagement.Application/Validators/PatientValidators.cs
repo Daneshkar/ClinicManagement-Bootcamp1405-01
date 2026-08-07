@@ -29,12 +29,7 @@ namespace ClinicManagement.Application.Validators
              .WithMessage("Phone number must be 11 characters.")
              .When(x => !string.IsNullOrEmpty(x.Phone));
 
-            RuleFor(x => x.Password)
-                .NotEmpty()
-                .WithMessage("Password is required.")
-                .MinimumLength(8)
-                .WithMessage("Password must be at least 8 characters.");
-
+          
         }
     }
 
