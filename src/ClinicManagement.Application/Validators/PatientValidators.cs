@@ -6,8 +6,6 @@ namespace ClinicManagement.Application.Validators
 {
     public class PatientSignupRequestValidator : AbstractValidator<PatientSignupRequest>
     {
-
-
         public PatientSignupRequestValidator()
         {
             RuleFor(x => x.NationalCode)
@@ -64,25 +62,14 @@ namespace ClinicManagement.Application.Validators
         public class DeletePatientRequestValidator : AbstractValidator<DeletePatientRequest>
         {
 
-
-
             public DeletePatientRequestValidator()
             {
                 RuleFor(x => x.NationalCode)
          .NotEmpty()
          .WithMessage("National Code is required for deletion.");
-
-
             }
-
-
-
         }
-
-
-
     public class GetPatientByNationalCodeRequestValidator:AbstractValidator<GetPatientByNationalCodeRequest>
-    
     {
         public GetPatientByNationalCodeRequestValidator()
         {

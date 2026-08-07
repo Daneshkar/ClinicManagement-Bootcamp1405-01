@@ -19,9 +19,7 @@ namespace ClinicManagement.Application.DTOs.Patients
                 
                 string? nationalcode,
                 string? name, 
-                string? phone,
-                string? password
-
+                string? phone
                 )
             {
 
@@ -35,45 +33,24 @@ namespace ClinicManagement.Application.DTOs.Patients
 
         }
 
-     public record GetPatientByNationalCodeRequest
-      {
+        public record GetPatientByNationalCodeRequest
+        {
+            private readonly string _nationalCode = string.Empty;
 
-          public string NationalCode { get; init; }
-
-
-
-           public GetPatientByNationalCodeRequest(
-
-             string? nationalcode)
-          {
-              NationalCode=nationalcode?.Trim() ?? string.Empty;
-
-          }
-             
-
-
-      }
-
-       public record GetAllPatientsRequest
-      {
-
-
-
-
+            public string NationalCode
+            {
+                get => _nationalCode;
+                init => _nationalCode = value?.Trim() ?? string.Empty;
+            }
         }
+       public record GetAllPatientsRequest
+      { }
 
         public record UpdatePatientRequest
         {
-
             public string NationalCode { get; init; }
             public string Name { get; init; }
             public string Phone { get; init; }
-
-
-
-
-
-
             public UpdatePatientRequest(
 
                 string? nationalcode,
@@ -90,25 +67,25 @@ namespace ClinicManagement.Application.DTOs.Patients
 
         }
 
-
         public record DeletePatientRequest
         {
+            private readonly string _nationalCode = string.Empty;
 
-            public string NationalCode { get; init; }
-
-
-
-            public DeletePatientRequest(
-
-                string? nationalcode
-                )
+            public string NationalCode
             {
-                NationalCode = nationalcode?.Trim() ?? string.Empty;
-
+                get => _nationalCode;
+                init => _nationalCode = value?.Trim() ?? string.Empty;
             }
-
-
         }
+        // public record DeletePatientRequest
+        // {
+        //
+        //     public string NationalCode { get; init; }
+        //     public DeletePatientRequest(string? nationalcode)
+        //     {
+        //         NationalCode = nationalcode?.Trim() ?? string.Empty;
+        //     }
+        // }
 
         public record PatientResponse
         {
