@@ -52,17 +52,18 @@ public class AppointmentService : IAppointmentService
                 $"Doctor with Medical ID '{request.DoctorMedicalId}' was not found.");
         }
 
-        // 3. Original Available Slots Logic
-        var startDate = DateTime.Now;
-        var rangeStart = startDate.Date;
+        // 3. Time Handling: Use Local Time for Clinic Operating Hours
+        var now = DateTime.Now; // Ensure server timezone matches clinic timezone, or use TimeZoneInfo
+        var rangeStart = now.Date;
         var rangeEnd = rangeStart.AddDays(ScheduleDaysSpan);
 
         List<DateTime> allPossibleSlots = GenerateWorkingHoursForNextWeek(rangeStart);
         var bookedAppointments = await _appointmentRepository.GetBookedVisitDatesAsync(request.DoctorMedicalId, rangeStart, rangeEnd);
         var bookedSet = new HashSet<DateTime>(bookedAppointments.Select(a => a.VisitDate));
 
+        // Filter out past slots (slot must be in the future relative to current exact time)
         var freeSlots = allPossibleSlots
-            .Where(slot => slot > startDate && !bookedSet.Contains(slot))
+            .Where(slot => slot > now && !bookedSet.Contains(slot))
             .Select(slot => new AvailableSlotResponse(
                 StartTime: slot,
                 EndTime: slot.AddMinutes(59).AddSeconds(59)))
@@ -80,7 +81,15 @@ public class AppointmentService : IAppointmentService
             return FormatValidationErrors(validationResult.Errors);
         }
 
-        // 2. DB State Check: Doctor Existence
+        // 2. Prevent booking past dates/times
+        if (request.VisitDate <= DateTime.Now)
+        {
+            return Error.Validation(
+                "Appointment.PastDate",
+                "Cannot book an appointment for a past date or time.");
+        }
+
+        // 3. DB State Check: Doctor Existence
         var doctorExists = await _doctorRepository.ExistsByMedicalIdAsync(request.DoctorMedicalId);
         if (!doctorExists)
         {
@@ -89,7 +98,7 @@ public class AppointmentService : IAppointmentService
                 $"Doctor with Medical ID '{request.DoctorMedicalId}' was not found.");
         }
 
-        // 3. DB State Check: Patient Existence
+        // 4. DB State Check: Patient Existence
         var patientExists = await _patientRepository.ExistsByNationalCodeAsync(request.PatientNationalCode);
         if (!patientExists)
         {
@@ -98,7 +107,7 @@ public class AppointmentService : IAppointmentService
                 $"Patient with National Code '{request.PatientNationalCode}' was not found.");
         }
 
-        // 4. DB State Check: Reserved Appointment Check
+        // 5. DB State Check: Reserved Appointment Check
         var appointmentIsReserved = await _appointmentRepository.ExistsAsync(request.DoctorMedicalId, request.VisitDate);
         if (appointmentIsReserved)
         {
@@ -107,7 +116,7 @@ public class AppointmentService : IAppointmentService
                 "The requested appointment slot is already reserved.");
         }
 
-        // 5. Create & Save
+        // 6. Create & Save
         var appointment = Appointment.Create(
             doctorMedicalId: request.DoctorMedicalId,
             patientNationalCode: request.PatientNationalCode,

@@ -21,7 +21,7 @@ namespace ClinicManagement.Api.Controllers
         {
             var result = await _patientService.GetAllPatientsAsync(request);
 
-            if (!result.IsSuccess)
+            if (result.IsSuccess)
             {
                 return Ok(result.Value);
             }
@@ -31,17 +31,13 @@ namespace ClinicManagement.Api.Controllers
         [ProducesResponseType(typeof(PatientResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult>  GetByNationalCode([FromRoute] string nationalCode)
-        {
-            var request = new GetPatientByNationalCodeRequest(nationalCode);
+        public async Task<IActionResult> GetByNationalCode([FromRoute] GetPatientByNationalCodeRequest request)        {
             var result = await _patientService.GetPatientByNationalCodeAsync(request);
             if (result.IsSuccess)
             {
                 return Ok(result.Value);
             }
             return HandleError(result.Error);
-
-
         }
 
         [HttpPost("signup")]
@@ -57,7 +53,6 @@ namespace ClinicManagement.Api.Controllers
                 return Ok(result.Value);
             }
             return HandleError(result.Error);
-
 
         }
 
@@ -85,15 +80,11 @@ namespace ClinicManagement.Api.Controllers
         public async Task<IActionResult> Delete([FromRoute] DeletePatientRequest request)
         {
             var result = await _patientService.DeletePatientAsync(request);
-
             if (result.IsSuccess)
-
             {
                 return Ok(result.Value);
-
             }
             return HandleError(result.Error);                
-
         }
         
         // --- Custom Error Handling Method ---

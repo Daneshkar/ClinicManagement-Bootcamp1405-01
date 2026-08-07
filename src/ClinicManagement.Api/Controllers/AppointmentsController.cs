@@ -22,22 +22,20 @@ public class AppointmentsController : ControllerBase
     /// </summary>
     /// <param name="request">The route parameter containing doctor's medical ID.</param>
     /// <returns>A list of open appointment slots for the doctor.</returns>
-    [HttpGet("available-slots/{MedicalId}")]
+    [HttpGet("available-slots/{DoctorMedicalId}")]
     [ProducesResponseType(typeof(DoctorAvailableSlotsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAvailableSlots([FromRoute] GetDoctorAvailableSlotsRequest request)
     {
         var result = await _appointmentService.GetAvailableSlotsAsync(request);
-
         if (result.IsSuccess)
         {
             return Ok(result.Value);
         }
-
         return HandleError(result.Error);
     }
-
+    
     /// <summary>
     /// Books a 1-hour appointment slot for a patient.
     /// </summary>
