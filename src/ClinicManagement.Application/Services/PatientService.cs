@@ -52,10 +52,10 @@ namespace ClinicManagement.Application.Interfaces.Services
 
             if (exsits)
             {
-                return Error.Conflict("Patient.DuplicateNationalCode", $"A patient with NationalCode'{request.NationalCode}' already exsits");
+                return Error.Conflict("Patient.DuplicateNationalCode", $"A patient with NationalCode' {request.NationalCode} ' already exsits");
 
             }
-            var passwordHash=_passwordHasher.HashPassword(request.Password);
+           
 
             
                 var patient = new Patient
@@ -85,6 +85,7 @@ namespace ClinicManagement.Application.Interfaces.Services
         public async Task<Result<IEnumerable<PatientResponse>>> GetAllPatientsAsync(
             GetAllPatientsRequest request)
         {
+
           var patients=await _patientRepository.GetAllAsync();
 
             var responseList = patients.Select(patient => new PatientResponse(
@@ -119,7 +120,7 @@ namespace ClinicManagement.Application.Interfaces.Services
             if (patient == null)
             {
 
-                return Error.NotFound("Patient.NotFound", $"Patient with National Code' {request.NationalCode}'  was not found");
+                return Error.NotFound("Patient.NotFound", $"Patient with National Code ' {request.NationalCode} '  was not found");
             }
             return Result<PatientResponse>.Success(new PatientResponse(
 
@@ -133,7 +134,7 @@ namespace ClinicManagement.Application.Interfaces.Services
             UpdatePatientRequest request)
         {
 
-            var validationResult = await  _updatePatientRequestValidator.ValidateAsync(request);
+            var validationResult = await _updatePatientRequestValidator.ValidateAsync(request);
             if (!validationResult.IsValid)
             {
                 return FormatValidationErrors(validationResult.Errors);
@@ -144,18 +145,41 @@ namespace ClinicManagement.Application.Interfaces.Services
             if (patient == null)
             {
 
-                return Error.NotFound("Patient.NotFound", $"Patient with National Code' {request.NationalCode}'  was not found");
+                return Error.NotFound("Patient.NotFound", $"Patient with National Code ' {request.NationalCode} '  was not found");
             }
             patient.Name = request.Name;
-            patient.Phone= request.Phone;
-            }
+            patient.Phone = request.Phone;
+            await _patientRepository.UpdateAsync(patient);
+            return Result<PatientResponse>.Success(
+                new PatientResponse(patient.NationalCode, patient.Name, patient.Phone));
 
+        }
 
         public async Task<Result<PatientResponse>> DeletePatientAsync(
             DeletePatientRequest request)
         {
-            var patient=await _patientRepository.GetByNationalCodeAsync(request.NationalCode);
 
+            var validationResult = await _deletePatientRequestValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                return FormatValidationErrors(validationResult.Errors);
+
+            }
+
+
+            var patient=await _patientRepository.GetByNationalCodeAsync(request.NationalCode);
+            if (patient == null)
+            {
+
+                return Error.NotFound("Patient.NotFound", $"Patient with National Code ' {request.NationalCode}  ' was not found");
+            }
+            var response = new PatientResponse(
+                patient.NationalCode, patient.Name, patient.Phone);
+
+            await _patientRepository.DeleteAsync(patient);
+            return Result<PatientResponse>.Success(response); 
+                
+               
         }
     }
 }
