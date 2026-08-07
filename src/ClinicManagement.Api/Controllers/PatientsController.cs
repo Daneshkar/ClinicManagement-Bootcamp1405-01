@@ -1,8 +1,6 @@
 ﻿using ClinicManagement.Application.Common;
-using ClinicManagement.Application.DTOs.Doctors;
 using ClinicManagement.Application.DTOs.Patients;
 using ClinicManagement.Application.Interfaces.Services;
-using ClinicManagement.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 namespace ClinicManagement.Api.Controllers
 {
@@ -24,61 +22,60 @@ namespace ClinicManagement.Api.Controllers
             var result = await _patientService.GetAllPatientsAsync(request);
 
             if (!result.IsSuccess)
-                return HandleError(result.Error);
-
-            return Ok(result.Value);
+            {
+                return Ok(result.Value);
+            }
+            return HandleError(result.Error);
         }
-
         [HttpGet("{NationalCode}")]
         [ProducesResponseType(typeof(PatientResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Get([FromRoute] string nationalCode)
+        public async Task<IActionResult>  GetByNationalCode([FromRoute] string nationalCode)
         {
             var request = new GetPatientByNationalCodeRequest(nationalCode);
-
-
             var result = await _patientService.GetPatientByNationalCodeAsync(request);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Value);
+            }
+            return HandleError(result.Error);
 
 
-
-            if (!result.IsSuccess)
-                return HandleError(result.Error);
-
-            return Ok(result.Value);
         }
 
         [HttpPost("signup")]
         [ProducesResponseType(typeof(PatientResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> Post([FromBody] PatientSignupRequest request)
+        public async Task<IActionResult> Signup([FromBody] PatientSignupRequest request)
         {
             var result = await _patientService.SignupAsync(request);
 
-            if (!result.IsSuccess)
+            if (result.IsSuccess)
             {
-                return HandleError(result.Error);
+                return Ok(result.Value);
             }
+            return HandleError(result.Error);
 
-            return Ok(result.Value);
+
         }
 
         [HttpPut("update")]
         [ProducesResponseType(typeof(PatientResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Put([FromBody] UpdatePatientRequest  request)
+        public async Task<IActionResult> Update([FromBody] UpdatePatientRequest  request)
         {
             var result = await _patientService.UpdatePatientAsync(request);
 
-            if (!result.IsSuccess)
+            if (result.IsSuccess)
             {
+                return Ok(result.Value);
 
-                return HandleError(result.Error);
             }
+            return HandleError(result.Error);
 
-            return Ok(result.Value);
         }
 
         [HttpDelete("{NationalCode}")]
@@ -89,13 +86,14 @@ namespace ClinicManagement.Api.Controllers
         {
             var result = await _patientService.DeletePatientAsync(request);
 
-            if (!result.IsSuccess)
+            if (result.IsSuccess)
 
             {
-                return HandleError(result.Error);                
-            }
+                return Ok(result.Value);
 
-            return Ok(result.Value);
+            }
+            return HandleError(result.Error);                
+
         }
         
         // --- Custom Error Handling Method ---

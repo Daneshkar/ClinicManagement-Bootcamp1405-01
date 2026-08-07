@@ -22,7 +22,7 @@ public class AppointmentController : ControllerBase
     /// </summary>
     /// <param name="doctorMedicalId">The medical license/ID of the target doctor.</param>
     /// <returns>A list of open appointment slots for the doctor.</returns>
-    [HttpGet("available-slots/{doctorMedicalId}")]
+    [HttpGet("available-slots/{MedicalId}")]
     [ProducesResponseType(typeof(DoctorAvailableSlotsResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAvailableSlots(string doctorMedicalId)
