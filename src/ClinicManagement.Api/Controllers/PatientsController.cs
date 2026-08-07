@@ -29,7 +29,7 @@ namespace ClinicManagement.Api.Controllers
             return Ok(result.Value);
         }
 
-        [HttpGet("{nationalCode}")]
+        [HttpGet("{NationalCode}")]
         [ProducesResponseType(typeof(PatientResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -64,7 +64,7 @@ namespace ClinicManagement.Api.Controllers
             return Ok(result.Value);
         }
 
-        [HttpPut]
+        [HttpPut("update")]
         [ProducesResponseType(typeof(PatientResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -81,7 +81,7 @@ namespace ClinicManagement.Api.Controllers
             return Ok(result.Value);
         }
 
-        [HttpDelete("{nationalCode}")]
+        [HttpDelete("{NationalCode}")]
         [ProducesResponseType(typeof(PatientResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

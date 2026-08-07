@@ -152,6 +152,9 @@ namespace ClinicManagement.Application.Interfaces.Services
             return Result<PatientResponse>.Success(
                 new PatientResponse(patient.NationalCode, patient.Name, patient.Phone));
 
+
+
+
         }
 
         public async Task<Result<PatientResponse>> DeletePatientAsync(
