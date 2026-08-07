@@ -1,25 +1,26 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.Text;
+using ClinicManagement.Application.Common;
 using ClinicManagement.Application.DTOs.Patients;
 
 namespace ClinicManagement.Application.Interfaces.Services
 {
     public interface IPatientService
     {
-        Task<PatientCreateResponseDto> CreatePatientAsync(
-        PatientCreateRequestDto request);
+        Task<Result<PatientResponse>> SignupAsync(
+         PatientSignupRequest request);
 
-        Task<IEnumerable<PatientGetResponseDto>> GetAllPatientsAsync();
+        Task<Result<IEnumerable<PatientResponse>>> GetAllPatientsAsync(
+      GetAllPatientsRequest request);
 
-        Task<PatientGetResponseDto?> GetPatientByNationalCodeAsync(
-            string nationalCode);
+        Task<Result<PatientResponse>> GetPatientByNationalCodeAsync(GetPatientByNationalCodeRequest request);
+           
 
-        Task<PatientUpdateResponseDto> UpdatePatientAsync(
-            string nationalCode,
-            PatientUpdateRequestDto request);
+        Task<Result<PatientResponse>> UpdatePatientAsync(
+            
+            UpdatePatientRequest request);
 
-        Task<PatientDeleteResponseDto> DeletePatientAsync(
-            string nationalCode);
+        Task<Result<PatientResponse>> DeletePatientAsync(
+            DeletePatientRequest request);
     }
 }
