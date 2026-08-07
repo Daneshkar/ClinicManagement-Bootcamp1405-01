@@ -1,6 +1,7 @@
 ﻿using ClinicManagement.Application.Common;
 using ClinicManagement.Application.DTOs.Patients;
 using ClinicManagement.Application.Interfaces.Repository;
+using ClinicManagement.Domain.Entities;
 using FluentValidation;
 
 namespace ClinicManagement.Application.Interfaces.Services
@@ -38,35 +39,123 @@ namespace ClinicManagement.Application.Interfaces.Services
         public async Task<Result<PatientResponse>> SignupAsync(
             PatientSignupRequest request)
         {
-            throw new NotImplementedException();
+        
+            var validationResult=await _patientSignupRequestValidator.ValidateAsync(request);
+            if (!validationResult.IsValid) { 
+            
+            return FormatValidationErrors(validationResult.Errors); 
+            
+            }
+
+
+            var exsits=await _patientRepository.ExistsByNationalCodeAsync(request.NationalCode);
+
+            if (exsits)
+            {
+                return Error.Conflict("Patient.DuplicateNationalCode", $"A patient with NationalCode'{request.NationalCode}' already exsits");
+
+            }
+            var passwordHash=_passwordHasher.HashPassword(request.Password);
+
+            
+                var patient = new Patient
+                {
+                    NationalCode = request.NationalCode,
+                    Name = request.Name,
+                    Phone = request.Phone
+                    
+                };
+            
+
+            await _patientRepository.AddAsync(patient);
+
+            return Result<PatientResponse>.Success(
+
+                new PatientResponse(patient.NationalCode,
+                patient.Name,
+                patient.Phone
+
+                ));
+                
+                
+               
         }
 
 
         public async Task<Result<IEnumerable<PatientResponse>>> GetAllPatientsAsync(
             GetAllPatientsRequest request)
         {
-            throw new NotImplementedException();
+          var patients=await _patientRepository.GetAllAsync();
+
+            var responseList = patients.Select(patient => new PatientResponse(
+
+                patient.NationalCode,patient.Name,patient.Phone
+
+                )
+                );
+
+            return  Result<IEnumerable<PatientResponse>>.Success(responseList);
+
+
         }
 
 
         public async Task<Result<PatientResponse>> GetPatientByNationalCodeAsync(
             GetPatientByNationalCodeRequest request)
         {
-            throw new NotImplementedException();
+            var validationResult = await _getPatientByNationalCodeRequestValidator.ValidateAsync(request);
+
+
+            if (!validationResult.IsValid)
+            {
+
+                return FormatValidationErrors(validationResult.Errors);
+
+
+            }
+            var patient=await _patientRepository.GetByNationalCodeAsync(request.NationalCode);
+
+
+            if (patient == null)
+            {
+
+                return Error.NotFound("Patient.NotFound", $"Patient with National Code' {request.NationalCode}'  was not found");
+            }
+            return Result<PatientResponse>.Success(new PatientResponse(
+
+                  patient.NationalCode, patient.Name, patient.Phone
+
+               ) );
         }
 
 
         public async Task<Result<PatientResponse>> UpdatePatientAsync(
             UpdatePatientRequest request)
         {
-            throw new NotImplementedException();
-        }
+
+            var validationResult = await  _updatePatientRequestValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                return FormatValidationErrors(validationResult.Errors);
+
+            }
+
+            var patient = await _patientRepository.GetByNationalCodeAsync(request.NationalCode);
+            if (patient == null)
+            {
+
+                return Error.NotFound("Patient.NotFound", $"Patient with National Code' {request.NationalCode}'  was not found");
+            }
+            patient.Name = request.Name;
+            patient.Phone= request.Phone;
+            }
 
 
         public async Task<Result<PatientResponse>> DeletePatientAsync(
             DeletePatientRequest request)
         {
-            throw new NotImplementedException();
+            var patient=await _patientRepository.GetByNationalCodeAsync(request.NationalCode);
+
         }
     }
 }
