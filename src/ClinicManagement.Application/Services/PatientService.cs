@@ -52,8 +52,7 @@ namespace ClinicManagement.Application.Interfaces.Services
 
             if (exsits)
             {
-                return Error.Conflict("Patient.DuplicateNationalCode", $"A patient with NationalCode' {request.NationalCode} ' already exsits");
-
+                return Error.NotFound("Patient.NotFound", $"Patient with National Code '{request.NationalCode}' was not found");
             }
            
 
@@ -120,7 +119,7 @@ namespace ClinicManagement.Application.Interfaces.Services
             if (patient == null)
             {
 
-                return Error.NotFound("Patient.NotFound", $"Patient with National Code ' {request.NationalCode} '  was not found");
+                return Error.NotFound("Patient.NotFound", $"Patient with National Code '{request.NationalCode}' was not found");
             }
             return Result<PatientResponse>.Success(new PatientResponse(
 
@@ -145,7 +144,7 @@ namespace ClinicManagement.Application.Interfaces.Services
             if (patient == null)
             {
 
-                return Error.NotFound("Patient.NotFound", $"Patient with National Code ' {request.NationalCode} '  was not found");
+                return Error.NotFound("Patient.NotFound", $"Patient with National Code '{request.NationalCode}' was not found");
             }
             patient.Name = request.Name;
             patient.Phone = request.Phone;
@@ -171,7 +170,7 @@ namespace ClinicManagement.Application.Interfaces.Services
             if (patient == null)
             {
 
-                return Error.NotFound("Patient.NotFound", $"Patient with National Code ' {request.NationalCode}  ' was not found");
+                return Error.NotFound("Patient.NotFound", $"Patient with National Code '{request.NationalCode}' was not found");
             }
             var response = new PatientResponse(
                 patient.NationalCode, patient.Name, patient.Phone);
