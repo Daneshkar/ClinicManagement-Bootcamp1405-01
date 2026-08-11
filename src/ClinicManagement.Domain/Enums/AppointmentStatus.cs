@@ -1,5 +1,3 @@
-
-
 namespace ClinicManagement.Domain.Enums
 {
     public enum AppointmentStatus
@@ -7,6 +5,5 @@ namespace ClinicManagement.Domain.Enums
     Reserved = 1,
     Visited=2,
     Missed=3
-    
     }
 }
