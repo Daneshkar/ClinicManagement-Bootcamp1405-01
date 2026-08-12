@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ClinicManagement.Application.Validators
 {
-    class LoginValidator
+    public class LoginValidator
         : AbstractValidator<DoctorLoginRequest>
     {
         public  LoginValidator() {
@@ -19,14 +19,9 @@ namespace ClinicManagement.Application.Validators
 
             RuleFor(x => x.Password)
               .NotEmpty()
-              .WithMessage("Password is required.")
-              .MinimumLength(8)
-              .WithMessage("Password must be at least 8 characters.");
-
+              .WithMessage("Password is required.");     
 
         }
-
-
 
     }
 }
