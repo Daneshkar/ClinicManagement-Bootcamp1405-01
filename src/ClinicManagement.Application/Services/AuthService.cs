@@ -70,15 +70,34 @@ namespace ClinicManagement.Application.Services
                 $"Input validation failed: {aggregatedErrors}"
             );
         }
-        public async Task<Result<AuthResponse>> RefreshTokenAsync(string refreshToken)
+        public async Task<Result<AuthResponse>> RefreshTokenAsync(string token)
         {
-
+           var refreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
+            if (refreshToken == null || refreshToken.IsRevoked || refreshToken.IsUsed || refreshToken.ExpiresAt <= DateTime.UtcNow)
+            {
+                return Error.Unauthorized("Auth.InvalidToccken",
+              "Invalid or expired refreshToken. ");
+            }
+            var doctor=await _doctorRepository.GetByMedicalIdAsync(refreshToken.DoctorMedicalId);
+            if (doctor is null)
+            {
+                return Error.Unauthorized("Auth.InvalidCredentials",
+                "Invalid medical ID or password.");
+            }
+            refreshToken.MarkAsUsed();
+            await _refreshTokenRepository.UpdateAsync(refreshToken);
+            var accessToken = _jwtTokenGenerator.GenerateAccessToken(doctor);
+            var refreshTokenValue = _jwtTokenGenerator.GenerateRefreshToken();
+            var newRefreshToken = RefreshToken.Create(doctor.MedicalId, refreshTokenValue, TimeSpan.FromDays(7));
+            await _refreshTokenRepository.AddAsync(newRefreshToken);
+            var result = new AuthResponse(accessToken, refreshTokenValue);
+            return result;
         }
 
         public async Task RevokeRefreshTokenAsync(string refreshToken)
         {
             var validationResult = await _loginValidator.ValidateAsync(request);
         }
-
+        
     }
 }
