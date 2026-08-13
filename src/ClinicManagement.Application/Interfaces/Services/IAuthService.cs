@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ClinicManagement.Application.Services
+namespace ClinicManagement.Application.Interfaces.Services
 {
     public interface IAuthService
     {
