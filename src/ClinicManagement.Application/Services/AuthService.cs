@@ -84,8 +84,8 @@ namespace ClinicManagement.Application.Services
 
             if (refreshToken == null || refreshToken.IsRevoked || refreshToken.IsUsed || refreshToken.ExpiresAt <= DateTime.UtcNow)
             {
-                return Error.Unauthorized("Auth.InvalidToccken",
-              "Invalid or expired refreshToken. ");
+                return Error.Unauthorized("Auth.InvalidToccken","Auth.InvalidRefreshToke"); 
+             
             }
             var doctor=await _doctorRepository.GetByMedicalIdAsync(refreshToken.DoctorMedicalId);
             if (doctor is null)
