@@ -94,10 +94,20 @@ namespace ClinicManagement.Application.Services
             return result;
         }
 
-        public async Task RevokeRefreshTokenAsync(string refreshToken)
+        public async Task RevokeRefreshTokenAsync(string token)
         {
-            var validationResult = await _loginValidator.ValidateAsync(request);
+            if (string.IsNullOrWhiteSpace(token))
+            { return;
+            }
+            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
+
+            if (refreshToken != null && !refreshToken.IsRevoked) 
+            {
+            refreshToken.Revoke();
+                await _refreshTokenRepository.UpdateAsync(refreshToken);
+            }
+
         }
-        
+
     }
 }
