@@ -34,7 +34,6 @@ namespace ClinicManagement.Application.Services
         }
         public async Task<Result<LoginServiceResult>> LoginAsync(DoctorLoginRequest request)
         {
-
             var validationResult = await _loginValidator.ValidateAsync(request);
             if (!validationResult.IsValid)
             {
@@ -62,15 +61,7 @@ namespace ClinicManagement.Application.Services
                 newRefreshToken.ExpiresAt,doctor.MedicalId);
             return result;
         }
-        private Error FormatValidationErrors(List<ValidationFailure> failures)
-        {
-            string aggregatedErrors = string.Join(" | ", failures.Select(f => $"{f.PropertyName}: {f.ErrorMessage}"));
-            // Using ErrorType.Validation and a generic code for all validation failures
-            return Error.Validation(
-                "Model.Validation", // A generic code for validation issues
-                $"Input validation failed: {aggregatedErrors}"
-            );
-        }
+
         public async Task<Result<AuthResponse>> RefreshTokenAsync(string token)
         {
             if (string.IsNullOrWhiteSpace(token))
@@ -80,11 +71,10 @@ namespace ClinicManagement.Application.Services
                     "Invalid or expired refresh token.");
             }
             var refreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
-
-
+            
             if (refreshToken == null || refreshToken.IsRevoked || refreshToken.IsUsed || refreshToken.ExpiresAt <= DateTime.UtcNow)
             {
-                return Error.Unauthorized("Auth.InvalidToccken","Auth.InvalidRefreshToke"); 
+                return Error.Unauthorized("Auth.InvalidToken","Auth.InvalidRefreshToken"); 
              
             }
             var doctor=await _doctorRepository.GetByMedicalIdAsync(refreshToken.DoctorMedicalId);
@@ -105,18 +95,25 @@ namespace ClinicManagement.Application.Services
 
         public async Task RevokeRefreshTokenAsync(string token)
         {
-            if (string.IsNullOrWhiteSpace(token))
-            { return;
-            }
-            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
+            if (string.IsNullOrWhiteSpace(token)) return;
 
-            if (refreshToken != null && !refreshToken.IsRevoked) 
+            var existingRefreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
+            if (existingRefreshToken != null && !existingRefreshToken.IsRevoked)
             {
-            refreshToken.Revoke();
-                await _refreshTokenRepository.UpdateAsync(refreshToken);
+                existingRefreshToken.Revoke();
+                await _refreshTokenRepository.UpdateAsync(existingRefreshToken);
             }
-
         }
-
+        
+        private Error FormatValidationErrors(List<ValidationFailure> failures)
+        {
+            string aggregatedErrors = string.Join(" | ", failures.Select(f => $"{f.PropertyName}: {f.ErrorMessage}"));
+            // Using ErrorType.Validation and a generic code for all validation failures
+            return Error.Validation(
+                "Model.Validation", // A generic code for validation issues
+                $"Input validation failed: {aggregatedErrors}"
+            );
+        }
+        
     }
 }
