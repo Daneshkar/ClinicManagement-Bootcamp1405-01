@@ -3,6 +3,7 @@ using ClinicManagement.Application.DTOs.Auth;
 using ClinicManagement.Application.Interfaces.Repository;
 using ClinicManagement.Application.Interfaces.Services;
 using ClinicManagement.Domain.Entities;
+using System.Linq;
 using FluentValidation;
 using FluentValidation.Results;
 using System;
@@ -72,7 +73,15 @@ namespace ClinicManagement.Application.Services
         }
         public async Task<Result<AuthResponse>> RefreshTokenAsync(string token)
         {
-           var refreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return Error.Unauthorized(
+                    "Auth.InvalidToken",
+                    "Invalid or expired refresh token.");
+            }
+            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
+
+
             if (refreshToken == null || refreshToken.IsRevoked || refreshToken.IsUsed || refreshToken.ExpiresAt <= DateTime.UtcNow)
             {
                 return Error.Unauthorized("Auth.InvalidToccken",
