@@ -20,7 +20,6 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     public string GenerateAccessToken(Doctor doctor)
     {
         var secretKey = _configuration["Jwt:SecretKey"]
-
                         ?? throw new InvalidOperationException("JWT SecretKey missing from configuration.");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
