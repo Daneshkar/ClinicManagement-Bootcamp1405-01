@@ -6,5 +6,7 @@ public enum ErrorType
     Validation = 1,
     NotFound = 2,
     Conflict = 3,
-    Failure = 4
+    Failure = 4,
+    Unauthorized = 5, // 401 Unauthorized
+    Forbidden = 6     // 403 Forbidden
 }

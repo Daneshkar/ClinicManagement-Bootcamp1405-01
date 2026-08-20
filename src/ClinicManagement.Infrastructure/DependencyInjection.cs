@@ -27,6 +27,8 @@ namespace ClinicManagement.Infrastructure
             services.AddScoped<IPatientRepository, PatientRepository>();
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
             return services;
         }
         #endregion
