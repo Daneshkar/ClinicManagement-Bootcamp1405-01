@@ -1,34 +1,57 @@
+using System.Text;
 using ClinicManagement.Application;
 using ClinicManagement.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
-using System.Text;
-
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Add Framework Services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// 2. Add Swashbuckle Swagger with JWT Support
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Clinic Management API", Version = "v1" });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter your JWT Access Token string below:"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+// 3. Configure CORS (Required for HttpOnly Cookies & Frontend Calls)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy
-            .WithOrigins(
-                "http://localhost:3000",
-                "http://localhost:4200")
+        policy.WithOrigins("http://localhost:3000", "http://localhost:4200")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
     });
 });
 
-
-// 2. Add Swashbuckle Swagger
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+// 4. Configure JWT Bearer Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -37,49 +60,23 @@ builder.Services
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(
-                    builder.Configuration["Jwt:SecretKey"]!)),
-
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!)),
             ClockSkew = TimeSpan.Zero
         };
     });
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Clinic Management API",
-        Version = "v1"
-    });
 
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header
-    });
-
-    options.AddSecurityRequirement(document =>
-        new OpenApiSecurityRequirement
-        {
-            [new OpenApiSecuritySchemeReference("Bearer", document)] = []
-        });
-});
-// 3. Register Clean Architecture Layers
+// 5. Register Clean Architecture Layers
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
 var app = builder.Build();
 
-// 4. Configure Request Pipeline
+// 6. Configure Request Pipeline
 if (app.Environment.IsDevelopment())
 {
-    // Serves OpenAPI spec and Swagger UI at http://localhost:<port>/swagger
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
@@ -88,13 +85,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// MUST be placed BEFORE UseAuthentication & UseAuthorization
 app.UseCors("AllowFrontend");
 
-// Required if you add Authentication/Authorization down the line
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Route requests to Controller classes in the API/Contracts layer
 app.MapControllers();
 
 app.Run();
