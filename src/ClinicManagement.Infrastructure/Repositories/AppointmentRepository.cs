@@ -1,5 +1,6 @@
 ﻿using ClinicManagement.Application.Interfaces.Repository;
 using ClinicManagement.Domain.Entities;
+using ClinicManagement.Domain.Enums;
 using ClinicManagement.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,6 +36,30 @@ namespace ClinicManagement.Infrastructure.Repositories
         {
             clinicDbContext.Appointments.Add(appointment);
             await clinicDbContext.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Appointment>> GetVisitedAppointmentsForFinancialReportAsync(
+    List<string> doctorMedicalIds,
+    DateTime? fromDate,
+    DateTime? toDate)
+        {
+            var query = clinicDbContext.Appointments
+                .AsNoTracking()
+                .Where(a =>
+                    a.Status == AppointmentStatus.Visited &&
+                    doctorMedicalIds.Contains(a.DoctorMedicalId));
+
+            if (fromDate.HasValue)
+            {
+                query = query.Where(a => a.VisitDate >= fromDate.Value);
+            }
+
+            if (toDate.HasValue)
+            {
+                query = query.Where(a => a.VisitDate <= toDate.Value);
+            }
+
+            return await query.ToListAsync();
         }
     }
 }

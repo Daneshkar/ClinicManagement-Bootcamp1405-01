@@ -14,7 +14,10 @@ public static class DependencyInjection
         //To Do: add services later
         services.AddScoped<IDoctorService, DoctorService>();
         services.AddScoped<IPatientService, PatientService>();
+        services.AddScoped<IAuthService, AuthService>();
+
         services.AddScoped<IAppointmentService, AppointmentService>();
+        services.AddScoped<IFinancialReportService, FinancialReportService>();
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         return services;
     }
