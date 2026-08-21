@@ -11,5 +11,15 @@ namespace ClinicManagement.Application.Interfaces.Repository
          List<string> doctorMedicalIds,
          DateTime? fromDate,
          DateTime? toDate);
+
+        Task<IEnumerable<Appointment>> GetTodayAppointmentsByDoctorIdAsync(
+        string doctorMedicalId,
+         DateTime date);
+
+        Task<Appointment?> GetByIdAsync(Guid id);
+
+        Task UpdateAsync(Appointment appointment);
+
+        Task SaveChangesAsync();
     }
 }
