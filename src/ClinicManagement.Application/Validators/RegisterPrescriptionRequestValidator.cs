@@ -20,4 +20,4 @@ public class RegisterPrescriptionRequestValidator : AbstractValidator<RegisterPr
             .MaximumLength(1000)
             .WithMessage("Prescription cannot exceed 1000 characters.");
     }
-}
+}D
