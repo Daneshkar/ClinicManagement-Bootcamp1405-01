@@ -103,7 +103,7 @@ namespace ClinicManagement.Infrastructure.Repositories
 
             public async Task SaveChangesAsync()
             {
-                await clinicDbContext.SaveChangesAsync();
+            await clinicDbContext.SaveChangesAsync();
             }
         }
     }
