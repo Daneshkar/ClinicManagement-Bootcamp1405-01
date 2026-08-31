@@ -1,4 +1,5 @@
-﻿using ClinicManagement.Application.DTOs.Treatment;
+﻿using ClinicManagement.Application.Common;
+using ClinicManagement.Application.DTOs.Treatment;
 using ClinicManagement.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -71,6 +72,23 @@ namespace ClinicManagement.Api.Controllers
             return User.FindFirstValue(ClaimTypes.NameIdentifier)
                 ?? User.FindFirstValue("sub")
                 ?? string.Empty;
+        }
+
+                private IActionResult HandleError(Error error)
+        {
+            // Assuming ErrorType is an enum or similar structure
+            // and that Error has properties like 'Code', 'Message', and 'Type'.
+            // You might need to adjust this based on your exact Error and ErrorType structure.
+            return error.Type switch
+            {
+                ErrorType.NotFound => StatusCode(StatusCodes.Status404NotFound, error),
+                ErrorType.Conflict => StatusCode(StatusCodes.Status409Conflict, error),
+                ErrorType.Validation => StatusCode(StatusCodes.Status400BadRequest,
+                    error),
+                ErrorType.Forbidden => StatusCode(StatusCodes.Status403Forbidden, error),
+                ErrorType.Unauthorized => StatusCode(StatusCodes.Status401Unauthorized, error),
+                _ => StatusCode(StatusCodes.Status400BadRequest, error) // Default for other unexpected errors
+            };
         }
     }
 }
