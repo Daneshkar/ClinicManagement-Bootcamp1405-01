@@ -7,7 +7,6 @@ namespace ClinicManagement.Application.DTOs.Treatment;
 public record TodayAppointmentResponse(
     Guid Id,
     string PatientNationalCode,
-    string PatientFullName,
     DateTime VisitDate,
     string Status,
     string? Prescription
