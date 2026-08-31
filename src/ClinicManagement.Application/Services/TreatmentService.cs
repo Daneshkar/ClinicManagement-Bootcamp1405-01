@@ -3,7 +3,9 @@ using ClinicManagement.Application.DTOs.Treatment;
 using ClinicManagement.Application.Interfaces.Repository;
 using ClinicManagement.Application.Interfaces.Services;
 using ClinicManagement.Domain.Enums;
-using System.ComponentModel.DataAnnotations;
+using FluentValidation;
+using FluentValidation.Results;
+
 
 namespace ClinicManagement.Application.Services
 {
@@ -44,15 +46,12 @@ namespace ClinicManagement.Application.Services
             {
                 await _appointmentRepository.SaveChangesAsync();
             }
-
-            var response = appointments.Select(a => new TodayAppointmentResponse
-            {
-                Id = a.Id,
-                PatientName = a.PatientName,
-                VisitDate = a.VisitDate,
-                Status = a.Status,
-                Prescription = a.Prescription
-            });
+        var response = appointments.Select(a => new TodayAppointmentResponse(
+                                            a.Id,
+                                            a.PatientNationalCode,
+                                            a.VisitDate,
+                                            a.Status.ToString(),
+                                            a.Prescription));
 
             return Result<IEnumerable<TodayAppointmentResponse>>.Success(response);
         }
@@ -66,31 +65,34 @@ namespace ClinicManagement.Application.Services
             if (!validationResult.IsValid)
             {
                 var errorMessage = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
-                return Result.Failure(Error.Validation(errorMessage));
+                return Result.Failure(Error.Validation("Treatment.Validation",errorMessage));            
             }
 
             var appointment = await _appointmentRepository.GetByIdAsync(request.AppointmentId);
             if (appointment is null)
             {
-                return Result.Failure(Error.NotFound("Appointment not found."));
+                return Error.NotFound("Appointment.NotFound", "Appointment not found.");
             }
 
             if (appointment.DoctorMedicalId != doctorMedicalId)
             {
-                return Result.Failure(Error.Forbidden("You are not authorized to write a prescription for this appointment."));
-            }
+                return Error.Forbidden("Treatment.Unauthorized", "You are not authorized to write prescriptions for this appointment.");            }
 
             var windowStart = appointment.VisitDate;
             var windowEnd = appointment.VisitDate.AddMinutes(59);
 
             if (currentTime < windowStart || currentTime > windowEnd)
             {
-                return Result.Failure(Error.Validation("Prescription can only be registered within the appointment's active time window."));
+                return Error.Validation("Treatment.InvalidTimeWindow", "Prescriptions can only be recorded within the 59-minute appointment time window.");
             }
-
-            if (appointment.Status == AppointmentStatus.Visited || appointment.Status == AppointmentStatus.Missed)
+            
+            if (appointment.Status == AppointmentStatus.Visited)
             {
-                return Result.Failure(Error.Conflict("This appointment has already been visited or marked as missed."));
+                return Error.Conflict("Treatment.AlreadyVisited", "This appointment has already been completed.");
+            }
+            if (appointment.Status == AppointmentStatus.Missed)
+            {
+                return Error.Conflict("Treatment.AppointmentMissed", "Cannot register a prescription for a missed appointment.");
             }
 
             appointment.Prescription = request.Prescription;
