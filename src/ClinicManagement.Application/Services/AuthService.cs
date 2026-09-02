@@ -77,7 +77,7 @@ namespace ClinicManagement.Application.Services
                 return Error.Unauthorized("Auth.InvalidToken","Auth.InvalidRefreshToken"); 
              
             }
-            var doctor=await _doctorRepository.GetByMedicalIdAsync(refreshToken.DoctorMedicalId);
+            var doctor=await _doctorRepository.GetByMedicalIdAsync(refreshToken.UserIdentifier);
             if (doctor is null)
             {
                 return Error.Unauthorized("Auth.InvalidCredentials",
