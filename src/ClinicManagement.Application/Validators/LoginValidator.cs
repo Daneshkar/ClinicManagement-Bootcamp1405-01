@@ -4,24 +4,23 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+
+
 namespace ClinicManagement.Application.Validators
 {
-    public class LoginValidator
-        : AbstractValidator<DoctorLoginRequest>
+    public class LoginValidator : AbstractValidator<LoginRequest>
     {
-        public  LoginValidator() {
-
-            RuleFor(x => x.MedicalId)
-                   .NotEmpty()
-                   .WithMessage("Medical ID is required.")
-                   .MaximumLength(20)
-                   .WithMessage("Medical ID cannot exceed 20 characters.");
+        public LoginValidator()
+        {
+            RuleFor(x => x.Identifier)
+                .NotEmpty()
+                .WithMessage("Identifier is required.")
+                .MaximumLength(50)
+                .WithMessage("Identifier cannot exceed 50 characters.");
 
             RuleFor(x => x.Password)
-              .NotEmpty()
-              .WithMessage("Password is required.");     
-
+                .NotEmpty()
+                .WithMessage("Password is required.");
         }
-
     }
 }
