@@ -5,7 +5,7 @@ public record LoginRequest(
     string Password
 )
 {
-    public string Identifier { get; init; } = Identifier.Trim();
+    public string Identifier { get; init; } = Identifier?.Trim() ?? string.Empty;
 }
 
 public record AuthResponse(

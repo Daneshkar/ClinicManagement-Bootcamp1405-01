@@ -15,7 +15,7 @@ namespace ClinicManagement.Application.Validators
             RuleFor(x => x.Identifier)
                 .NotEmpty()
                 .WithMessage("Identifier is required.")
-                .MaximumLength(50)
+                .MaximumLength(20)
                 .WithMessage("Identifier cannot exceed 50 characters.");
 
             RuleFor(x => x.Password)
