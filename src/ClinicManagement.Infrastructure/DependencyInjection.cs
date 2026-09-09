@@ -24,6 +24,7 @@ namespace ClinicManagement.Infrastructure
                     sqlOptions => sqlOptions.MigrationsAssembly(
                         typeof(ClinicDbContext).Assembly.FullName)));
             services.AddScoped<IDoctorRepository, DoctorRepository>();
+            services.AddScoped<ISecretaryRepository, SecretaryRepository>();
             services.AddScoped<IPatientRepository, PatientRepository>();
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();

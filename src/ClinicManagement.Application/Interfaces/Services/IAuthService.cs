@@ -8,8 +8,7 @@ namespace ClinicManagement.Application.Interfaces.Services
 {
     public interface IAuthService
     {
-        public  Task<Result<LoginServiceResult>> LoginAsync(DoctorLoginRequest request);
-
+        Task<Result<LoginServiceResult>> LoginAsync(LoginRequest request);
         public  Task<Result<AuthResponse>> RefreshTokenAsync(string refreshToken);
 
         public  Task RevokeRefreshTokenAsync(string refreshToken);

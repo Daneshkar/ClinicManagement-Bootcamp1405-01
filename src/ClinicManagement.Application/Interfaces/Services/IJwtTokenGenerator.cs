@@ -1,16 +1,11 @@
 ﻿using ClinicManagement.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using ClinicManagement.Domain.Enums;
 
 namespace ClinicManagement.Application.Interfaces.Services
 {
     public interface IJwtTokenGenerator
     {
-
-        public string GenerateAccessToken(Doctor  doctor);
-        public string GenerateRefreshToken();
-
-
+        string GenerateAccessToken(string userIdentifier, string name, UserRole role);
+        string GenerateRefreshToken();
     }
 }

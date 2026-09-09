@@ -3,117 +3,142 @@ using ClinicManagement.Application.DTOs.Auth;
 using ClinicManagement.Application.Interfaces.Repository;
 using ClinicManagement.Application.Interfaces.Services;
 using ClinicManagement.Domain.Entities;
-using System.Linq;
-using FluentValidation;
-using FluentValidation.Results;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using ClinicManagement.Domain.Enums;
 
-namespace ClinicManagement.Application.Services
+
+namespace ClinicManagement.Application.Services;
+
+public class AuthService : IAuthService
+
 {
-    public class AuthService : IAuthService
+    private readonly IDoctorRepository _doctorRepository;
+    private readonly ISecretaryRepository _secretaryRepository;
+    private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly IPasswordHasher _passwordHasher;
+    private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    public AuthService(
+        IDoctorRepository doctorRepository,
+        ISecretaryRepository secretaryRepository,
+        IRefreshTokenRepository refreshTokenRepository,
+        IPasswordHasher passwordHasher,
+        IJwtTokenGenerator jwtTokenGenerator)
     {
-        private readonly IDoctorRepository _doctorRepository;
-        private readonly IRefreshTokenRepository _refreshTokenRepository;
-        private readonly IPasswordHasher _passwordHasher;
-        private readonly IJwtTokenGenerator _jwtTokenGenerator;
-        private readonly IValidator<DoctorLoginRequest> _loginValidator;
-        public AuthService(IDoctorRepository doctorRepository,
+        _doctorRepository = doctorRepository;
+        _secretaryRepository = secretaryRepository;
+        _refreshTokenRepository = refreshTokenRepository;
+        _passwordHasher = passwordHasher;
+        _jwtTokenGenerator = jwtTokenGenerator;
+    }
+    public async Task<Result<LoginServiceResult>> LoginAsync(LoginRequest request)
+    {
+        string userIdentifier;
+        string name;
+        string passwordHash;
+        UserRole role;
 
-           IRefreshTokenRepository refreshTokenRepository,
-            IPasswordHasher passwordHasher,
-        IJwtTokenGenerator jwtTokenGenerator, IValidator<DoctorLoginRequest> loginValidator)
+        // 1. Try resolving as Doctor first
+        var doctor = await _doctorRepository.GetByMedicalIdAsync(request.Identifier);
+        if (doctor != null)
         {
-            _doctorRepository = doctorRepository;
-            _refreshTokenRepository = refreshTokenRepository;
-            _passwordHasher = passwordHasher;
-            _jwtTokenGenerator = jwtTokenGenerator;
-            _loginValidator = loginValidator;
-
+            userIdentifier = doctor.MedicalId;
+            name = doctor.Name;
+            passwordHash = doctor.PasswordHash;
+            role = UserRole.Doctor;
         }
-        public async Task<Result<LoginServiceResult>> LoginAsync(DoctorLoginRequest request)
+        else
         {
-            var validationResult = await _loginValidator.ValidateAsync(request);
-            if (!validationResult.IsValid)
+            // 2. Fall back to Secretary lookup
+            var secretary = await _secretaryRepository.GetByUsernameAsync(request.Identifier);
+            if (secretary == null)
             {
-                var error = FormatValidationErrors(validationResult.Errors);
-                return error;
+                return Error.Unauthorized("Auth.InvalidCredentials", "Invalid credentials.");
             }
-            var doctor = await _doctorRepository.GetByMedicalIdAsync(request.MedicalId);
-            if (doctor is null)
-            {
-                return Error.Unauthorized("Auth.InvalidCredentials",
-                "Invalid medical ID or password.");
-            }
-            if (!_passwordHasher.IsMatch(request.Password, doctor.PasswordHash))
-            {
-                return Error.Unauthorized("Auth.InvalidCredentials",
-               "Invalid medical ID or password.");
-
-            }
-            var accessToken = _jwtTokenGenerator.GenerateAccessToken(doctor);
-            var refreshToken = _jwtTokenGenerator.GenerateRefreshToken();
-            var newRefreshToken = RefreshToken.Create(doctor.MedicalId, refreshToken,
-    TimeSpan.FromDays(7));
-       await _refreshTokenRepository.AddAsync(newRefreshToken);
-            var result = new LoginServiceResult(accessToken,refreshToken,
-                newRefreshToken.ExpiresAt,doctor.MedicalId);
-            return result;
+            userIdentifier = secretary.UserName;
+            name = secretary.Name;
+            passwordHash = secretary.PasswordHash;
+            role = UserRole.Secretary;
+        }
+        // 3. Verify Password
+        if (!_passwordHasher.IsMatch(request.Password, passwordHash))
+        {
+            return Error.Unauthorized("Auth.InvalidCredentials", "Invalid credentials.");
         }
 
-        public async Task<Result<AuthResponse>> RefreshTokenAsync(string token)
+        // 4. Issue Tokens
+        var accessToken = _jwtTokenGenerator.GenerateAccessToken(userIdentifier, name, role);
+        var refreshTokenValue = _jwtTokenGenerator.GenerateRefreshToken();
+        var newRefreshToken = RefreshToken.Create(userIdentifier, refreshTokenValue, TimeSpan.FromDays(7));
+
+        await _refreshTokenRepository.AddAsync(newRefreshToken);
+        return new LoginServiceResult(accessToken, refreshTokenValue, newRefreshToken.ExpiresAt, userIdentifier);
+    }
+    public async Task<Result<AuthResponse>> RefreshTokenAsync(string token)
+    {
+        if (string.IsNullOrWhiteSpace(token))
         {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                return Error.Unauthorized(
-                    "Auth.InvalidToken",
-                    "Invalid or expired refresh token.");
-            }
-            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
-            
-            if (refreshToken == null || refreshToken.IsRevoked || refreshToken.IsUsed || refreshToken.ExpiresAt <= DateTime.UtcNow)
-            {
-                return Error.Unauthorized("Auth.InvalidToken","Auth.InvalidRefreshToken"); 
-             
-            }
-            var doctor=await _doctorRepository.GetByMedicalIdAsync(refreshToken.UserIdentifier);
-            if (doctor is null)
-            {
-                return Error.Unauthorized("Auth.InvalidCredentials",
-                "Invalid medical ID or password.");
-            }
-            refreshToken.MarkAsUsed();
-            await _refreshTokenRepository.UpdateAsync(refreshToken);
-            var accessToken = _jwtTokenGenerator.GenerateAccessToken(doctor);
-            var refreshTokenValue = _jwtTokenGenerator.GenerateRefreshToken();
-            var newRefreshToken = RefreshToken.Create(doctor.MedicalId, refreshTokenValue, TimeSpan.FromDays(7));
-            await _refreshTokenRepository.AddAsync(newRefreshToken);
-            var result = new AuthResponse(accessToken, refreshTokenValue);
-            return result;
+            return Error.Unauthorized("Auth.InvalidToken", "Invalid refresh token.");
         }
 
-        public async Task RevokeRefreshTokenAsync(string token)
+        var refreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
+        if (refreshToken == null)
         {
-            if (string.IsNullOrWhiteSpace(token)) return;
+            return Error.Unauthorized("Auth.InvalidToken", "Invalid refresh token.");
+        }
+        // Theft Detection: Attempting to use a revoked or already-used token
 
-            var existingRefreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
-            if (existingRefreshToken != null && !existingRefreshToken.IsRevoked)
-            {
-                existingRefreshToken.Revoke();
-                await _refreshTokenRepository.UpdateAsync(existingRefreshToken);
-            }
-        }
-        
-        private Error FormatValidationErrors(List<ValidationFailure> failures)
+        if (refreshToken.IsRevoked || refreshToken.IsUsed)
         {
-            string aggregatedErrors = string.Join(" | ", failures.Select(f => $"{f.PropertyName}: {f.ErrorMessage}"));
-            // Using ErrorType.Validation and a generic code for all validation failures
-            return Error.Validation(
-                "Model.Validation", // A generic code for validation issues
-                $"Input validation failed: {aggregatedErrors}"
-            );
+            await _refreshTokenRepository.RevokeAllForUserAsync(refreshToken.UserIdentifier);
+
+            return Error.Unauthorized("Auth.TokenReuseDetected", "Security alert: Token reuse detected. Session invalidated.");
         }
-        
+        if (refreshToken.ExpiresAt <= DateTime.UtcNow)
+        {
+            return Error.Unauthorized("Auth.TokenExpired", "Refresh token has expired.");
+        }
+        // Resolve user role for new claims
+        UserRole role;
+        string name;
+        var doctor = await _doctorRepository.GetByMedicalIdAsync(refreshToken.UserIdentifier);
+        if (doctor != null)
+        {
+            role = UserRole.Doctor;
+            name = doctor.Name;
+        }
+        else
+        {
+            var secretary = await _secretaryRepository.GetByUsernameAsync(refreshToken.UserIdentifier);
+            if (secretary == null)
+            {
+                return Error.Unauthorized("Auth.UserNotFound", "User associated with token no longer exists.");
+            }
+            role = UserRole.Secretary;
+            name = secretary.Name;
+        }
+
+        // Consume old token and emit new pair
+        refreshToken.MarkAsUsed();
+        await _refreshTokenRepository.UpdateAsync(refreshToken);
+
+        var newAccessToken = _jwtTokenGenerator.GenerateAccessToken(refreshToken.UserIdentifier, name, role);
+        var newRefreshTokenValue = _jwtTokenGenerator.GenerateRefreshToken();
+        var newRefreshToken = RefreshToken.Create(refreshToken.UserIdentifier, newRefreshTokenValue, TimeSpan.FromDays(7));
+
+        await _refreshTokenRepository.AddAsync(newRefreshToken);
+        return new AuthResponse(newAccessToken, newRefreshTokenValue);
+
+    }
+
+    public async Task RevokeRefreshTokenAsync(string token)
+
+    {
+        if (string.IsNullOrWhiteSpace(token)) return;
+        var existingRefreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
+        if (existingRefreshToken != null && !existingRefreshToken.IsRevoked)
+        {
+            existingRefreshToken.Revoke();
+            await _refreshTokenRepository.UpdateAsync(existingRefreshToken);
+        }
     }
 }
+
