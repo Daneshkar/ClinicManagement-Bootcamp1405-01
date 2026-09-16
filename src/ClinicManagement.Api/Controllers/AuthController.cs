@@ -1,12 +1,14 @@
 ﻿using ClinicManagement.Application.Common;
 using ClinicManagement.Application.DTOs.Auth;
 using ClinicManagement.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicManagement.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[AllowAnonymous]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
