@@ -1,11 +1,13 @@
 ﻿using ClinicManagement.Application.Common;
 using ClinicManagement.Application.DTOs.Patients;
 using ClinicManagement.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace ClinicManagement.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Secretary")]
     public class PatientsController : ControllerBase
     {
         private readonly IPatientService _patientService;
