@@ -10,6 +10,7 @@ namespace ClinicManagement.Application.Interfaces.Repository
         public Task AddAsync(RefreshToken refreshToken);
         public Task<RefreshToken?> GetByTokenAsync(string token);
         public Task UpdateAsync(RefreshToken refreshToken);
+        Task RevokeAllForUserAsync(string userIdentifier);
 
     }
 }

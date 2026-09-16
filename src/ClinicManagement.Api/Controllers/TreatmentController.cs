@@ -10,7 +10,7 @@ namespace ClinicManagement.Api.Controllers
     [ApiController]
     [Route("api/treatment")]
     [Produces("application/json")]
-    [Authorize]
+    [Authorize(Roles = "Doctor")]
     public class TreatmentController : ControllerBase
     {
         private readonly ITreatmentService _treatmentService;
