@@ -2,6 +2,7 @@
 using ClinicManagement.Application.Common;
 using ClinicManagement.Application.DTOs.Doctors;
 using ClinicManagement.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicManagement.Api.Controllers
@@ -9,6 +10,8 @@ namespace ClinicManagement.Api.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Secretary")]
+
     public class DoctorsController : ControllerBase
     {
         private readonly IDoctorService _doctorService;
@@ -19,6 +22,7 @@ namespace ClinicManagement.Api.Controllers
         }
 
         [HttpPost("signup")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(DoctorResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(DoctorResponse), StatusCodes.Status409Conflict)]

@@ -13,7 +13,7 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     {
         _context = context;
     }
-    
+
     public async Task AddAsync(RefreshToken refreshToken)
     {
         await _context.Set<RefreshToken>().AddAsync(refreshToken);
@@ -31,4 +31,24 @@ public class RefreshTokenRepository : IRefreshTokenRepository
         _context.Set<RefreshToken>().Update(refreshToken);
         await _context.SaveChangesAsync();
     }
+
+
+    public async Task RevokeAllForUserAsync(string userIdentifier)
+    {
+        var activeTokens = await _context.RefreshTokens
+            .Where(rt => rt.UserIdentifier == userIdentifier && !rt.IsRevoked)
+            .ToListAsync();
+
+        foreach (var token in activeTokens)
+        {
+            token.Revoke();
+        }
+
+        if (activeTokens.Any())
+        {
+            await _context.SaveChangesAsync();
+        }
+    }
+
+
 }

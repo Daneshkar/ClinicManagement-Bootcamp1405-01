@@ -1,6 +1,7 @@
 ﻿using ClinicManagement.Application.Common;
 using ClinicManagement.Application.DTOs.Reports;
 using ClinicManagement.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace ClinicManagement.Api.Controllers;
 
 [ApiController]
 [Route("api/financial-reports")]
+[Authorize(Roles = "Secretary")]
 public class FinancialReportsController : ControllerBase
 {
     private readonly IFinancialReportService _financialReportService;

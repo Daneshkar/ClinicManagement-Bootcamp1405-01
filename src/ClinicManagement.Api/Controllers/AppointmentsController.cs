@@ -1,6 +1,7 @@
 using ClinicManagement.Application.Common;
 using ClinicManagement.Application.DTOs.Appointments;
 using ClinicManagement.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicManagement.Api.Controllers;
@@ -8,6 +9,7 @@ namespace ClinicManagement.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
+[Authorize(Roles = "Secretary")]
 public class AppointmentsController : ControllerBase
 {
     private readonly IAppointmentService _appointmentService;

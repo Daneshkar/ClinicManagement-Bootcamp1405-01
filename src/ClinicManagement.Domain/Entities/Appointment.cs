@@ -10,8 +10,8 @@ public class Appointment
 
     // Encapsulated properties
     public DateTime VisitDate { get; private set; }
-    public AppointmentStatus Status { get; private set; }
-    public string? Prescription { get; private set; }
+    public AppointmentStatus Status { get; set; }
+    public string? Prescription { get; set; }
 
     // Navigation properties
     public Doctor? Doctor { get; private set; }
@@ -33,7 +33,7 @@ public class Appointment
             DoctorMedicalId = doctorMedicalId,
             PatientNationalCode = patientNationalCode,
             VisitDate = visitDate,
-            Status =status,
+            Status = status,
             Prescription = null
         };
     }

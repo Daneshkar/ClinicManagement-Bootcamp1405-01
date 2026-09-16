@@ -18,26 +18,19 @@ public class DoctorConfiguration : IEntityTypeConfiguration<Doctor>
 
         builder.HasKey(d => d.MedicalId);
 
-
         builder.Property(d => d.MedicalId)
             .IsRequired()
             .HasMaxLength(20)
             .IsUnicode(false);
-            
-
-   
 
         builder.Property(d => d.Name)
             .IsRequired()
             .HasMaxLength(100);
 
 
-
         builder.Property(d => d.Fee)
             .IsRequired()
             .HasColumnType("decimal(18,2)");
-
-
 
         builder.Property(d => d.PasswordHash)
             .IsRequired()

@@ -15,7 +15,7 @@ public static class DependencyInjection
         services.AddScoped<IDoctorService, DoctorService>();
         services.AddScoped<IPatientService, PatientService>();
         services.AddScoped<IAuthService, AuthService>();
-
+        services.AddScoped< ITreatmentService, TreatmentService>();
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddScoped<IFinancialReportService, FinancialReportService>();
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

@@ -1,10 +1,10 @@
 using System.Text;
 using ClinicManagement.Application;
+using ClinicManagement.Domain.Enums; // Ensure this matches your UserRole enum namespace
 using ClinicManagement.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Add Framework Services
@@ -68,13 +68,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// 5. Register Clean Architecture Layers
+// 5. Configure Authorization Policies
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireDoctorRole", policy =>
+        policy.RequireRole(UserRole.Doctor.ToString()));
+
+    options.AddPolicy("RequireSecretaryRole", policy =>
+        policy.RequireRole(UserRole.Secretary.ToString()));
+});
+
+// 6. Register Clean Architecture Layers
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
-// 6. Configure Request Pipeline
+// 7. Configure Request Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -94,4 +104,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+// 8. Execute Database Seeding on Startup
+using (var scope = app.Services.CreateScope())
+{
+    await scope.ServiceProvider.SeedInitialSecretaryAsync();
+}
+
+await app.RunAsync();
